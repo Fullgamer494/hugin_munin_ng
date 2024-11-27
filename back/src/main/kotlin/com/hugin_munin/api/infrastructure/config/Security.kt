@@ -32,7 +32,10 @@ fun Application.configureSecurity() {
             challenge { _, _ ->
                 call.respond(
                     HttpStatusCode.Unauthorized,
-                    mapOf("error" to "Token inválido o expirado")
+                    mapOf(
+                        "error" to "Token inválido o expirado",
+                        "message" to "Debes autenticarte para acceder a este recurso"
+                    )
                 )
             }
         }
@@ -63,6 +66,17 @@ val ApplicationCall.userRole: String
         ?.asString()
         ?: throw IllegalStateException("Usuario no autenticado")
 
+// Extension para obtener el ID del rol del token
+val ApplicationCall.userRoleId: Int
+    get() = when(userRole) {
+        "Administrador" -> 1
+        "Biólogo" -> 2
+        "Veterinario" -> 3
+        "Patólogo" -> 4
+        "Cuidador" -> 5
+        else -> throw IllegalStateException("Rol desconocido: $userRole")
+    }
+
 // Extension para obtener los permisos del token
 val ApplicationCall.userPermissions: List<String>
     get() = principal<JWTPrincipal>()
@@ -87,3 +101,7 @@ fun ApplicationCall.hasAnyPermission(vararg permissions: String): Boolean {
     val userPerms = userPermissions
     return permissions.any { it in userPerms }
 }
+
+// Extension para verificar si el usuario es administrador
+val ApplicationCall.isAdmin: Boolean
+    get() = userRole == "Administrador" || userRoleId == 1

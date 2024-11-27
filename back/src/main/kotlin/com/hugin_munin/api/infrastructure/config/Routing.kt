@@ -6,9 +6,13 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.auth.*
-import com.hugin_munin.api.infrastructure.api.routes.*
+import com.hugin_munin.api.infrastructure.api.routes.authRouting
+import com.hugin_munin.api.infrastructure.api.routes.especimenRouting
+import com.hugin_munin.api.infrastructure.api.routes.registroAltaRouting
+import com.hugin_munin.api.infrastructure.api.routes.registroBajaRouting
+import com.hugin_munin.api.infrastructure.api.routes.reporteRouting
+import com.hugin_munin.api.infrastructure.api.routes.trasladoRouting
 import com.hugin_munin.api.application.services.*
-import com.hugin_munin.api.domain.ports.EspecimenRepository
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 
@@ -20,7 +24,6 @@ fun Application.configureRouting() {
     val authService by inject<AuthService>()
     val especimenService by inject<EspecimenService>()
     val registroAltaService by inject<RegistroAltaService>()
-    val especimenRepository by inject<EspecimenRepository>()
     val registroBajaService by inject<RegistroBajaService>()
     val reporteService by inject<ReporteService>()
     val trasladoService by inject<TrasladoService>()
