@@ -8,13 +8,13 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import kotlinx.serialization.Serializable
 
-
+// Exception lanzada cuando el usuario no tiene permisos suficientes
 class PermissionDeniedException(
     val requiredPermissions: List<String>,
     val userPermissions: List<String>
 ) : Exception("Permisos insuficientes. Requeridos: $requiredPermissions, Usuario tiene: $userPermissions")
 
-
+// Validar que el usuario tenga UN permiso específico
 suspend fun ApplicationCall.requirePermission(permission: String) {
     if (!hasPermission(permission)) {
         respond(
@@ -30,6 +30,7 @@ suspend fun ApplicationCall.requirePermission(permission: String) {
     }
 }
 
+// Validar que el usuario tenga TODOS los permisos especificados
 suspend fun ApplicationCall.requireAllPermissions(vararg permissions: String) {
     val userPerms = userPermissions
     val missingPermissions = permissions.filter { it !in userPerms }
@@ -49,6 +50,7 @@ suspend fun ApplicationCall.requireAllPermissions(vararg permissions: String) {
     }
 }
 
+// Validar que el usuario tenga AL MENOS UNO de los permisos especificados
 suspend fun ApplicationCall.requireAnyPermission(vararg permissions: String) {
     if (!hasAnyPermission(*permissions)) {
         respond(
