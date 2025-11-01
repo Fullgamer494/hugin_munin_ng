@@ -1,1 +1,58 @@
-<p>form works!</p>
+
+<div class="main-content">
+            <header class="main-header">
+                <div class="page-name">
+                    <nav class="breadcrumb-nav">
+                        <a href="registered_animals_table.html" class="animals">Animales</a>
+                        <span><i class="ti ti-chevron-right"></i></span>
+                        <a href="">Registrar ejemplar</a>
+                    </nav>
+                    <h1>Registrar ejemplar</h1>
+                </div>
+                            </header>
+<form [formGroup]="Formanimals" class="form" id="registerSpecimen" (ngSubmit)="onSubmit()">
+
+  <div class="form-sections-wrapper">
+    <app-identificacion 
+      [formGroup]="Formanimals" 
+      [isExpanded]="sections.identificacion"
+      (toggle)="toggleSection('identificacion')">
+    </app-identificacion>
+
+    <app-clasificacion 
+      [formGroup]="Formanimals"
+      [isExpanded]="sections.clasificacion"
+      (toggle)="toggleSection('clasificacion')">
+    </app-clasificacion>
+
+    <app-procedencia 
+      [formGroup]="Formanimals"
+      [isExpanded]="sections.procedencia"
+      (toggle)="toggleSection('procedencia')">
+    </app-procedencia>
+
+    <app-ubicacion 
+      [formGroup]="Formanimals"
+      [isExpanded]="sections.ubicacion"
+      (toggle)="toggleSection('ubicacion')">
+    </app-ubicacion>
+
+    <app-descriptiva 
+      [formGroup]="Formanimals"
+      [isExpanded]="sections.descriptiva"
+      (toggle)="toggleSection('descriptiva')">
+    </app-descriptiva>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-submit">
+      Aceptar
+    </button>
+    <button type="button" class="btn-reset" (click)="onCancel()">
+      Cancelar
+    </button>
+  </div>
+</form>
+
+        
+</div>

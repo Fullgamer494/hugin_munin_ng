@@ -1,0 +1,22 @@
+<section class="form-section" [formGroup]="formGroup">
+  <header class="form-section-header">
+    <button type="button" class="toggle-btn" 
+            [attr.aria-expanded]="isExpanded"
+            (click)="onToggle()">
+      <span class="toggle-icon">
+        <i class="ti ti-chevron-down"></i>
+      </span>
+      <h2>Clasificación taxonómica</h2>
+    </button>
+  </header>
+  <div class="form-section-body" [class.showed]="isExpanded">
+    <div class="form-group">
+      <label for="genero">Género:</label>
+      <input type="text" id="genero" formControlName="genero" required>
+    </div>
+    <div class="form-group">
+      <label for="especie">Especie:</label>
+      <input type="text" id="especie" formControlName="especie" required>
+    </div>
+  </div>
+</section>

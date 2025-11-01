@@ -1,0 +1,26 @@
+<section class="form-section" [formGroup]="formGroup">
+  <header class="form-section-header">
+    <button type="button" class="toggle-btn" 
+            [attr.aria-expanded]="isExpanded"
+            (click)="onToggle()">
+      <span class="toggle-icon">
+        <i class="ti ti-chevron-down"></i>
+      </span>
+      <h2>Información de procedencia</h2>
+    </button>
+  </header>
+  <div class="form-section-body" [class.showed]="isExpanded">
+    <div class="form-group">
+      <label for="id_origen">Origen:</label>
+      <select id="id_origen" formControlName="id_origen" required>
+        <option *ngFor="let origin of originOptions" [value]="origin.id">
+          {{ origin.name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="procedencia">Procedencia:</label>
+      <input type="text" id="procedencia" formControlName="procedencia" required>
+    </div>
+  </div>
+</section>

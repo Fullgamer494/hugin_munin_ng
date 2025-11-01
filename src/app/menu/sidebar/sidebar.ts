@@ -24,10 +24,6 @@ export class SidebarComponent {
     }
   }
 
-  isActive(menu: string): boolean {
-    return this.selectedMenu === menu;
-  }
-
   logout(): void {
     console.log('Sesión cerrada');
   }
