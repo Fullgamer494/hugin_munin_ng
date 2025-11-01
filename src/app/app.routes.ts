@@ -16,6 +16,10 @@ export const routes: Routes = [
   },
   */
   {
+  path: 'detail/:id',
+  loadComponent: () => import('./presentation/pages/reports/report-detail/report-detail.component').then(m => m.ReportDetailComponent)
+  },
+  {
     path: 'reports',
     children: [
       {

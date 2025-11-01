@@ -1,3 +1,88 @@
-<div>
-  <h1>Report Detail Component</h1>
-</div>
+<main>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="page-name">
+        <nav class="breadcrumb-nav">
+          <a routerLink="/animals">Animales</a>
+          <span><i class="ti ti-chevron-right"></i></span>
+          @if (report()) {
+            <a [routerLink]="['/specimen', report()!.id_especimen]">
+              Ejemplar <span>{{ report()!.getSpecimenIdentifier() }}</span>
+            </a>
+            <span><i class="ti ti-chevron-right"></i></span>
+            <a [routerLink]="['/reports/history']" [queryParams]="{ id: report()!.id_especimen }">
+              Historial de reportes
+            </a>
+            <span><i class="ti ti-chevron-right"></i></span>
+            <a>Reporte <span id="asunto">{{ report()!.asunto }}</span></a>
+          }
+        </nav>
+        @if (report()) {
+          <h1>Ver reporte <span id="tipoReporte">{{ report()!.getTipoReporteName().toLowerCase() }}</span></h1>
+        }
+      </div>
+      <div class="back-btn">
+        <a (click)="goBack()">
+          <i class="ti ti-arrow-left"></i>
+          Regresar
+        </a>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <p>Cargando reporte...</p>
+    }
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    @if (!loading() && report()) {
+      <div class="content-card">
+        <div class="reporte-actions">
+          <button (click)="downloadPDF()">
+            <span>Descargar PDF</span>
+            <i class="ti ti-download"></i>
+          </button>
+        </div>
+        
+        <div class="reporte-content" id="pdf">
+          <div class="reporte-header">
+            <div class="reporte-logo">
+              <img src="assets/logo-report.svg" alt="Logo">
+            </div>
+            <div class="fecha-reporte">
+              <span class="label">Fecha del reporte:</span>
+              <span class="value">{{ report()!.getFormattedDate() }}</span>
+            </div>
+          </div>
+
+          <div class="reporte-title">
+            <h2>{{ report()!.asunto }}</h2>
+            <h3>{{ report()!.getSpecimenIdentifier() }}</h3>
+          </div>
+
+          <div class="reporte-details">
+            <div class="detail-info">
+              <span class="label">Número de inventario del espécimen:</span>
+              <span class="value">{{ report()!.getSpecimenIdentifier() }}</span>
+              <span class="label">ID de reporte:</span>
+              <span class="value">{{ report()!.id_reporte }}</span>
+              <span class="label">Nombre científico:</span>
+              <span class="value">{{ report()!.getSpecimenScientificName() }}</span>
+            </div>
+          </div>
+
+          <div class="reporte-content-text">
+            <p>{{ report()!.contenido }}</p>
+          </div>
+
+          <div class="reporte-responsable">
+            <span class="label">Att:</span>
+            <span class="value">{{ report()!.getResponsableName() }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</main>

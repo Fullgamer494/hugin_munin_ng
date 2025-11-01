@@ -101,4 +101,6 @@ export class ReportEntity implements Report {
   isActive(): boolean {
     return this.especimen?.activo || false;
   }
+
+  
 }
