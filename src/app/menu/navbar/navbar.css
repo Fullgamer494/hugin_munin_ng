@@ -1,0 +1,112 @@
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+header {
+  width: 100%;
+  height: 100%;
+  padding: clamp(8px, 10px, 10px);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 20px;
+  background-color: var(--header);
+  border-radius: clamp(12px, 18px, 24px);
+}
+
+
+.logo {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.logo a {
+  display: block;
+  width: 48px;
+  height: 48px;
+}
+
+.logo a img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: transparent;
+}
+
+
+
+.user {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+
+.profile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 10px;
+  background: transparent;
+  border: none;
+  border-radius: clamp(6px, 10px, 12px);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.profile-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.profile i{
+    padding: 20px;
+    font-size: 32px;
+    color: var(--bg);
+    padding-left: 20px;
+}
+.profile-data span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: var(--bg);
+}
+
+.profile-data .user {
+  font-weight: 600;
+}
+
+.profile-data .rol {
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+
+
+@media screen and (min-width: 1024px) {
+  header {
+    padding-bottom: 0;
+  }
+
+  .header-content {
+    padding: 0 30px 0 38px;
+  }
+}

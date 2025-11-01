@@ -1,0 +1,250 @@
+
+.page-home {
+  width: 100%;
+  height: 100%;
+  padding: clamp(8px, 10px, 10px);
+}
+
+.aside-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 120%;
+  height: 100%;
+  background-color: var(--aside);
+  border-radius: clamp(12px, 18px, 24px);
+}
+
+.nav-options {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.nav-options > li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+  padding: 80px 20px;
+  margin: 20px;
+  border-radius: clamp(6px, 10px, 12px);
+  transition: background-color 0.4s ease;
+}
+
+.nav-options > li.active {
+  background-color: var(--nav-option-selected);
+}
+
+.nav-options li a,
+.nav-options li button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+}
+
+.nav-options > li i {
+  font-size: 28px;
+  color: var(--night);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-options span {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+.nav-options > li:hover:not(.active) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.subnav-options {
+  position: absolute;
+  left: calc(50% + 20px);
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 20px);
+  height: 0;
+  padding: 0;
+  margin: 0;
+  background-color: var(--bg);
+  border: var(--stroke) solid 1px;
+  border-bottom: none;
+  border-radius: clamp(6px, 10px, 12px) clamp(6px, 10px, 12px) 0 0;
+  opacity: 0;
+  overflow: hidden;
+  list-style: none;
+  z-index: 1000;
+  transition: height 0.4s ease, opacity 0.4s ease;
+}
+
+.subnav-options.open {
+  height: 200px;
+  opacity: 1;
+}
+
+.subnav-options li {
+  flex: 1;
+  width: 100%;
+}
+
+.subnav-options li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding-left: 10px;
+}
+
+.subnav-options li.active i,
+.subnav-options li.active span {
+  color: var(--night);
+  font-weight: 600;
+}
+
+.subnav-options li i {
+  font-size: 24px;
+  color: var(--night);
+}
+
+.subnav-options li span {
+  font-size: 14px;
+  color: var(--night);
+}
+
+.logout-btn {
+  display: none;
+}
+
+@media screen and (min-width: 1024px) {
+  .page-home {
+    padding: clamp(6px, 10px, 12px);
+  }
+
+  .aside-content {
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+
+  .nav-options {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    padding-top: 15px;
+  }
+
+  .nav-options > li {
+    width: 85%;
+    height: auto;
+    padding: 0;
+  }
+
+  .nav-options li a,
+  .nav-options li button {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 18px;
+    width: 100%;
+  }
+
+  .nav-options > li i {
+    font-size: 22px;
+    width: 22px;
+    min-width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .nav-options > li span {
+    text-align: left;
+    font-size: 13px;
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  .subnav-options {
+    top: 0;
+    left: 100%;
+    bottom: auto;
+    width: 0;
+    height: 200px;
+    border-left: none;
+    border-bottom: var(--stroke) solid 1px;
+    border-radius: 0 clamp(6px, 10px, 12px) clamp(6px, 10px, 12px) 0;
+    transition: width 0.4s ease, opacity 0.4s ease;
+  }
+
+  .subnav-options.open {
+    width: 200px;
+  }
+
+  .subnav-options li a {
+    justify-content: flex-start;
+    gap: 15px;
+    padding-left: 15px;
+  }
+
+  .subnav-options li i {
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .subnav-options li span {
+    flex: 1;
+    text-align: left;
+  }
+
+  .logout-btn {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    padding-bottom: 15px;
+  }
+
+  .logout-btn button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 75%;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    border-radius: clamp(6px, 10px, 12px);
+    cursor: pointer;
+    transition: background-color 0.4s ease;
+  }
+
+  .logout-btn button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .logout-btn button i {
+    font-size: 26px;
+    color: var(--night);
+  }
+}
