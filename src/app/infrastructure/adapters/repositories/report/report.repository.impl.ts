@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { ReportRepository, CreateReportDto, UpdateReportDto } from '../../../../core/domain/ports/outbound/report/report.repository';
-import { Report, ReportEntity } from '../../../../core/domain/entities/report/report.entity';
+import { ReportEntity } from '../../../../core/domain/entities/report/report.entity';
 import { environment } from '../../../../../environments/environment';
 
 interface ApiResponse<T> {
@@ -18,32 +18,32 @@ export class ReportRepositoryImpl implements ReportRepository {
 
   constructor(private readonly http: HttpClient) {}
 
-  findAll(): Observable<Report[]> {
-    return this.http.get<ApiResponse<Report[]>>(this.apiUrl).pipe(
+  findAll(): Observable<ReportEntity[]> {
+    return this.http.get<ApiResponse<any[]>>(this.apiUrl).pipe(
       map(response => response.data.map(report => this.toDomain(report)))
     );
   }
 
-  findById(id: number): Observable<Report | null> {
-    return this.http.get<ApiResponse<Report>>(`${this.apiUrl}/${id}`).pipe(
+  findById(id: number): Observable<ReportEntity | null> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${id}`).pipe(
       map(response => response.data ? this.toDomain(response.data) : null)
     );
   }
 
-  findBySpecimen(specimenId: number): Observable<Report[]> {
-    return this.http.get<ApiResponse<Report[]>>(`${this.apiUrl}/especimen/${specimenId}`).pipe(
+  findBySpecimen(specimenId: number): Observable<ReportEntity[]> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/especimen/${specimenId}`).pipe(
       map(response => response.data.map(report => this.toDomain(report)))
     );
   }
 
-  create(data: CreateReportDto): Observable<Report> {
-    return this.http.post<ApiResponse<Report>>(this.apiUrl, data).pipe(
+  create(data: CreateReportDto): Observable<ReportEntity> {
+    return this.http.post<ApiResponse<any>>(this.apiUrl, data).pipe(
       map(response => this.toDomain(response.data))
     );
   }
 
-  update(id: number, data: UpdateReportDto): Observable<Report> {
-    return this.http.put<ApiResponse<Report>>(`${this.apiUrl}/${id}`, data).pipe(
+  update(id: number, data: UpdateReportDto): Observable<ReportEntity> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/${id}`, data).pipe(
       map(response => this.toDomain(response.data))
     );
   }
@@ -52,7 +52,7 @@ export class ReportRepositoryImpl implements ReportRepository {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  private toDomain(apiReport: any): Report {
+  private toDomain(apiReport: any): ReportEntity {
     return new ReportEntity(
       apiReport.id_reporte,
       apiReport.id_tipo_reporte,

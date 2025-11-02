@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Report } from '../../../domain/entities/report/report.entity';
+import { ReportEntity } from '../../../domain/entities/report/report.entity';
 import { ReportRepository, CreateReportDto, UpdateReportDto } from '../../../domain/ports/outbound/report/report.repository';
 
 import {
@@ -18,7 +18,7 @@ import {
 export class GetAllReportsService implements GetAllReportsUseCase {
   constructor(private readonly reportRepository: ReportRepository) {}
 
-  execute(): Observable<Report[]> {
+  execute(): Observable<ReportEntity[]> {
     return this.reportRepository.findAll();
   }
 }
@@ -29,7 +29,7 @@ export class GetAllReportsService implements GetAllReportsUseCase {
 export class GetReportByIdService implements GetReportByIdUseCase {
   constructor(private readonly reportRepository: ReportRepository) {}
 
-  execute(id: number): Observable<Report | null> {
+  execute(id: number): Observable<ReportEntity | null> {
     return this.reportRepository.findById(id);
   }
 }
@@ -40,7 +40,7 @@ export class GetReportByIdService implements GetReportByIdUseCase {
 export class GetReportsBySpecimenService implements GetReportsBySpecimenUseCase {
   constructor(private readonly reportRepository: ReportRepository) {}
 
-  execute(specimenId: number): Observable<Report[]> {
+  execute(specimenId: number): Observable<ReportEntity[]> {
     return this.reportRepository.findBySpecimen(specimenId);
   }
 }
@@ -51,7 +51,7 @@ export class GetReportsBySpecimenService implements GetReportsBySpecimenUseCase 
 export class CreateReportService implements CreateReportUseCase {
   constructor(private readonly reportRepository: ReportRepository) {}
 
-  execute(data: CreateReportDto): Observable<Report> {
+  execute(data: CreateReportDto): Observable<ReportEntity> {
     return this.reportRepository.create(data);
   }
 }
@@ -62,7 +62,7 @@ export class CreateReportService implements CreateReportUseCase {
 export class UpdateReportService implements UpdateReportUseCase {
   constructor(private readonly reportRepository: ReportRepository) {}
 
-  execute(id: number, data: UpdateReportDto): Observable<Report> {
+  execute(id: number, data: UpdateReportDto): Observable<ReportEntity> {
     return this.reportRepository.update(id, data);
   }
 }

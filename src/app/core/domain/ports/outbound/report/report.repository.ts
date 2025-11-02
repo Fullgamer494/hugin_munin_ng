@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Report } from '../../../entities/report/report.entity';
+import { ReportEntity } from '../../../entities/report/report.entity';
 
 export interface CreateReportDto {
   id_tipo_reporte: number;
@@ -20,10 +20,10 @@ export interface UpdateReportDto {
 }
 
 export abstract class ReportRepository {
-  abstract findAll(): Observable<Report[]>;
-  abstract findById(id: number): Observable<Report | null>;
-  abstract findBySpecimen(specimenId: number): Observable<Report[]>;
-  abstract create(data: CreateReportDto): Observable<Report>;
-  abstract update(id: number, data: UpdateReportDto): Observable<Report>;
+  abstract findAll(): Observable<ReportEntity[]>;
+  abstract findById(id: number): Observable<ReportEntity | null>;
+  abstract findBySpecimen(specimenId: number): Observable<ReportEntity[]>;
+  abstract create(data: CreateReportDto): Observable<ReportEntity>;
+  abstract update(id: number, data: UpdateReportDto): Observable<ReportEntity>;
   abstract delete(id: number): Observable<void>;
 }
