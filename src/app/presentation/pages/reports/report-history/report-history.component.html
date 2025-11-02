@@ -1,3 +1,130 @@
-<div>
-  <h1>Report History Component</h1>
-</div>
+<main>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="page-name">
+        <nav class="breadcrumb-nav">
+          <a routerLink="/animals">Animales</a>
+          <span><i class="ti ti-chevron-right"></i></span>
+          <a>Ejemplar <span>{{ specimenNumber() }}</span></a>
+          <span><i class="ti ti-chevron-right"></i></span>
+          <a>Historial de reportes</a>
+        </nav>
+        <h1>Historial de reportes</h1>
+      </div>
+      <div class="back-btn">
+        <a (click)="goBack()">
+          <i class="ti ti-arrow-left"></i>
+          Regresar
+        </a>
+      </div>
+    </header>
+
+    @if (loading()) {
+    <p>Cargando reportes...</p>
+    }
+
+    @if (error()) {
+    <p class="error">{{ error() }}</p>
+    }
+
+    @if (!loading() && !error()) {
+    <section class="controls">
+      <div class="search-container">
+        <label for="searchInput"><i class="ti ti-search"></i></label>
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar..." [value]="searchQuery()"
+          (input)="onSearch($event)">
+      </div>
+      <div class="filters">
+        <div class="filter-group">
+          <label for="sortSelect">Ordenar por</label>
+          <select class="filter-select" id="sortSelect" [value]="sortBy()" (change)="onSortChange($event)">
+            <option value="asunto">Asunto</option>
+            <option value="tipoReporte">Tipo de reporte</option>
+            <option value="responsable">Responsable</option>
+            <option value="fechaCreacion">Fecha de creación</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-body">
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" class="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
+              </th>
+              <th>Asunto</th>
+              <th>Tipo de reporte</th>
+              <th>Responsable</th>
+              <th>Fecha de creación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (report of paginatedReports(); track report.id_reporte) {
+            <tr>
+              <td>
+                <input type="checkbox" class="checkbox row-checkbox" [checked]="isSelected(report.id_reporte)"
+                  (change)="toggleSelectReport(report.id_reporte)">
+              </td>
+              <td>{{ report.asunto }}</td>
+              <td>{{ report.getTipoReporteName() }}</td>
+              <td>{{ report.getResponsableName() }}</td>
+              <td>{{ report.getFormattedDate() }}</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="actions-btn" (click)="toggleMenu(report.id_reporte)">
+                    <i class="fa-solid fa-ellipsis"></i>
+                  </button>
+                  <div class="actions-menu" [class.show]="isMenuOpen(report.id_reporte)">
+                    <a [routerLink]="['/detail', report.id_reporte]">
+                      <i class="ti ti-eye"></i> Ver
+                    </a>
+                    <a [routerLink]="['/reports/edit', report.id_reporte]">
+                      <i class="ti ti-edit"></i> Editar
+                    </a>
+                    <button (click)="deleteReport(report.id_reporte)">
+                      <i class="ti ti-trash"></i> Eliminar
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <div class="pagination-info">
+          <span>{{ paginationInfo() }}</span>
+          <select class="pagination-filter-select" [value]="itemsPerPage()" (change)="onItemsPerPageChange($event)">
+            <option value="10">10 por página</option>
+            <option value="25">25 por página</option>
+            <option value="50">50 por página</option>
+            <option value="100">100 por página</option>
+          </select>
+        </div>
+
+        <div class="pagination-controls">
+          <button class="page-btn" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">
+            <i class="ti ti-chevron-left"></i>
+          </button>
+
+          @for (page of getPageNumbers(); track page) {
+          <button class="page-btn" [class.active]="page === currentPage()" (click)="changePage(page)">
+            {{ page }}
+          </button>
+          }
+
+          <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">
+            <i class="ti ti-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+    }
+  </div>
+</main>

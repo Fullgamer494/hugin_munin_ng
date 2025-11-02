@@ -20,12 +20,20 @@ export const routes: Routes = [
   loadComponent: () => import('./presentation/pages/reports/report-detail/report-detail.component').then(m => m.ReportDetailComponent)
   },
   {
+  path: 'reports/history',
+  loadComponent: () => import('./presentation/pages/reports/report-history/report-history.component').then(m => m.ReportHistoryComponent)
+  },
+  {
+  path: 'reports/edit/:id',
+  loadComponent: () => import('./presentation/pages/reports/report-edit/report-edit.component').then(m => m.ReportEditComponent)
+  },
+  {
     path: 'reports',
     children: [
       {
-        path: 'clinical',
-        loadComponent: () => import('./presentation/pages/reports/report-form/report-form.component').then(m => m.ReportFormComponent),
-        data: { reportType: 1 }
+          path: 'clinical',
+      loadComponent: () => import('./presentation/pages/reports/report-form/report-form.component').then(m => m.ReportFormComponent),
+      data: { reportType: 1 }
       },
       {
         path: 'behavioral',
