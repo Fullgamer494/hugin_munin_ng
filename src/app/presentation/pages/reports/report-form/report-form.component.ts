@@ -1,19 +1,19 @@
-    import { Component, OnInit, signal, ViewEncapsulation } from '@angular/core';
-    import { CommonModule } from '@angular/common';
-    import { FormsModule } from '@angular/forms';
-    import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-    import { CreateReportUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
-    import { SearchSpecimensUseCase, GetSpecimenByIdUseCase } from '../../../../core/domain/ports/inbound/report/specimen.use-case';
-    import { Specimen } from '../../../../core/domain/entities/report/report.entity';
-    import { AuthService } from '../../../../infrastructure/adapters/auth/auth.service';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { debounceTime, Subject } from 'rxjs';
+import { CreateReportUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
+import { SearchSpecimensUseCase } from '../../../../core/domain/ports/inbound/report/specimen.use-case';
+import { Specimen } from '../../../../core/domain/entities/report/report.entity';
+import { AuthService } from '../../../../infrastructure/adapters/auth/auth.service';
 
 @Component({
   selector: 'app-report-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TitleCasePipe],
   templateUrl: './report-form.component.html',
-  styleUrl: './report-form.component.css',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './report-form.component.css'
 })
 export class ReportFormComponent implements OnInit {
   reportType = signal<number>(1);
@@ -31,14 +31,13 @@ export class ReportFormComponent implements OnInit {
   error = signal<string | null>(null);
   success = signal<string | null>(null);
 
-  private searchTimeout: any;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private createReportUseCase: CreateReportUseCase,
     private searchSpecimensUseCase: SearchSpecimensUseCase,
-    private getSpecimenByIdUseCase: GetSpecimenByIdUseCase,
     private authService: AuthService
   ) {}
 
@@ -48,12 +47,7 @@ export class ReportFormComponent implements OnInit {
       this.setReportTypeName();
     });
 
-    this.route.queryParams.subscribe(params => {
-      const specimenId = params['specimen_id'];
-      if (specimenId) {
-        this.loadPreselectedSpecimen(+specimenId);
-      }
-    });
+    this.setupSearchDebounce();
   }
 
   private setReportTypeName(): void {
@@ -67,12 +61,20 @@ export class ReportFormComponent implements OnInit {
     this.reportTypeName.set(names[this.reportType()]);
   }
 
+  private setupSearchDebounce(): void {
+    this.searchSubject.pipe(
+      debounceTime(300)
+    ).subscribe(query => {
+      if (query.length >= 2) {
+        this.searchSpecimens(query);
+      }
+    });
+  }
+
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const query = input.value.trim();
     this.searchQuery.set(query);
-
-    clearTimeout(this.searchTimeout);
 
     if (query.length === 0) {
       this.showResults.set(false);
@@ -85,11 +87,7 @@ export class ReportFormComponent implements OnInit {
       this.selectedSpecimen.set(null);
     }
 
-    if (query.length >= 2) {
-      this.searchTimeout = setTimeout(() => {
-        this.searchSpecimens(query);
-      }, 300);
-    }
+    this.searchSubject.next(query);
   }
 
   private searchSpecimens(query: string): void {
@@ -115,21 +113,6 @@ export class ReportFormComponent implements OnInit {
     const specimen = this.selectedSpecimen();
     if (!specimen) return '';
     return `${specimen.num_inventario} - ${specimen.nombre_especimen || 'Sin nombre'}`;
-  }
-
-  private loadPreselectedSpecimen(specimenId: number): void {
-    this.getSpecimenByIdUseCase.execute(specimenId).subscribe({
-      next: (specimen) => {
-        if (specimen) {
-          this.selectSpecimen(specimen);
-          this.success.set('Espécimen cargado automáticamente');
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.error.set('Error al cargar el espécimen');
-      }
-    });
   }
 
   onSubmit(): void {
@@ -193,7 +176,7 @@ export class ReportFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/reports']);
+    this.router.navigate(['/']);
   }
 
   hideResults(): void {

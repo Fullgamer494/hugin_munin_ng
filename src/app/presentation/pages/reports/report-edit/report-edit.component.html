@@ -1,3 +1,119 @@
-<div>
-  <h1>Report Edit Component</h1>
-</div>
+<main>
+  <div class="main-content">
+    <header class="main-header">
+      <div class="page-name">
+        <nav class="breadcrumb-nav">
+          <a [routerLink]="['/reports', reportTypeName()]">{{ reportTypeName() | titlecase }}</a>
+          <span><i class="ti ti-chevron-right"></i></span>
+          <a>Editar reporte {{ reportTypeName() }}</a>
+        </nav>
+        <h1>Editar reporte {{ reportTypeName() }}</h1>
+      </div>
+    </header>
+
+    @if (loading()) {
+      <p>Cargando datos del reporte...</p>
+    }
+
+    @if (error()) {
+      <div class="form-message error">
+        {{ error() }}
+      </div>
+    }
+
+    @if (success()) {
+      <div class="form-message success">
+        {{ success() }}
+      </div>
+    }
+
+    @if (!loading()) {
+      <div class="search-container">
+        <div class="search">
+          <label for="search"><i class="ti ti-search"></i></label>
+          <input 
+            type="text" 
+            class="search-input" 
+            id="search" 
+            placeholder="Buscar por número de inventario PLXXX, MXXX"
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            (blur)="hideResults()">
+        </div>
+
+        @if (showResults()) {
+          <div class="search-results">
+            @if (searchResults().length === 0) {
+              <div class="search-result-item no-results">No se encontraron especímenes</div>
+            } @else {
+              @for (specimen of searchResults(); track specimen.id_especimen) {
+                <div class="search-result-item" (click)="selectSpecimen(specimen)">
+                  <div class="specimen-info">
+                    <strong>{{ specimen.num_inventario }}</strong>
+                    <span class="specimen-name">- {{ specimen.nombre_especimen || 'Sin nombre' }} -</span>
+                    <i [class]="specimen.activo ? 'active' : 'inactive'">
+                      {{ specimen.activo ? 'Activo' : 'Inactivo' }}
+                    </i>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      @if (selectedSpecimen()) {
+        <div class="selected-specimen">
+          <h4>Espécimen seleccionado:</h4>
+          <p><strong>Número de inventario:</strong> {{ selectedSpecimen()!.num_inventario }}</p>
+          <p><strong>Nombre:</strong> {{ selectedSpecimen()!.nombre_especimen || 'Sin nombre' }}</p>
+          <p><strong>Estado:</strong> {{ selectedSpecimen()!.activo ? 'Activo' : 'Inactivo' }}</p>
+        </div>
+      }
+
+      <div class="form-container">
+        <form (ngSubmit)="onSubmit()">
+          <div class="report">
+            <label for="asunto">Asunto:</label>
+            <input 
+              type="text" 
+              class="asunto" 
+              id="asunto" 
+              name="asunto" 
+              placeholder="Asunto del reporte..."
+              [value]="asunto()"
+              (input)="asunto.set($any($event.target).value)"
+              required>
+          </div>
+
+          <div class="report">
+            <label for="contenido">Contenido:</label>
+            <textarea 
+              id="contenido" 
+              name="contenido" 
+              rows="4" 
+              placeholder="Contenido del reporte..."
+              [value]="contenido()"
+              (input)="contenido.set($any($event.target).value)"
+              required></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-submit" 
+              [disabled]="loading()">
+              {{ loading() ? 'Actualizando reporte...' : 'Actualizar reporte' }}
+            </button>
+            <button 
+              type="button" 
+              class="btn-reset"
+              (click)="onCancel()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</main>

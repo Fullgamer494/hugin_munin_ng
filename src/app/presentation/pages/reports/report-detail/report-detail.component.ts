@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GetReportByIdUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
-import { Report, ReportEntity } from '../../../../core/domain/entities/report/report.entity';
+import { ReportEntity } from '../../../../core/domain/entities/report/report.entity';
 
 @Component({
   selector: 'app-report-detail',
@@ -44,19 +44,7 @@ export class ReportDetailComponent implements OnInit {
     this.getReportByIdUseCase.execute(this.reportId).subscribe({
       next: (report) => {
         if (report) {
-          const reportEntity = new ReportEntity(
-            report.id_reporte,
-            report.id_tipo_reporte,
-            report.id_especimen,
-            report.id_responsable,
-            report.asunto,
-            report.contenido,
-            report.fecha_reporte,
-            report.tipo_reporte,
-            report.especimen,
-            report.responsable
-          );
-          this.report.set(reportEntity);
+          this.report.set(report);
         } else {
           this.error.set('Reporte no encontrado');
         }
