@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+:root {
+    --night: #0C0F0A;
+    --bg: #FBFBFB;
+    --btn-green: #A7D14D;
+    --main-green: #84BC0D;
+    --white: #FFFFFF;
+    --stroke: #818181;
+
+    --p-size: 14px;
+    --nav-op-size: 14px;
+    --title-sec-size: 36px;
+}
