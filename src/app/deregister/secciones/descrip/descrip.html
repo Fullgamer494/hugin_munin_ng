@@ -1,0 +1,21 @@
+<section class="form-section" [formGroup]="formGroup">
+  <header class="form-section-header">
+    <button type="button" class="toggle-btn" 
+            [attr.aria-expanded]="isExpanded"
+            (click)="onToggle()">
+      <span class="toggle-icon">
+        <i class="ti ti-chevron-down"></i>
+      </span>
+      <h2>Información descriptiva</h2>
+    </button>
+  </header>
+  <div class="form-section-body" [class.showed]="isExpanded">
+    <div class="form-group form-notes">
+      <label for="observaciones_baja">Observaciones de baja:</label>
+      <textarea id="observaciones_baja" 
+                formControlName="observaciones_baja"
+                rows="4" 
+                placeholder="Describa características especiales del animal (color, marcas, comportamiento, etc.)"></textarea>
+    </div>
+  </div>
+</section>

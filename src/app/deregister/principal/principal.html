@@ -1,0 +1,44 @@
+<div class="main-content">
+  <header class="main-header">
+    <div class="page-name">
+      <nav class="breadcrumb-nav">
+        <a href="registered_animals_table.html" class="animals">Animales</a>
+        <span><i class="ti ti-chevron-right"></i></span>
+        <a href="">Dar de baja ejemplar</a>
+      </nav>
+      <h1>Dar de baja ejemplar</h1>
+    </div>
+  </header>
+  
+  <form [formGroup]="deregisterForm" class="form" id="deregisterSpecimen" (ngSubmit)="onSubmit()">
+    
+    <div class="form-sections-wrapper">
+      <app-identificacion-baja 
+        [formGroup]="deregisterForm" 
+        [isExpanded]="sections.identificacion"
+        (toggle)="toggleSection('identificacion')">
+      </app-identificacion-baja>
+
+      <app-datos-baja 
+        [formGroup]="deregisterForm"
+        [isExpanded]="sections.datosBaja"
+        (toggle)="toggleSection('datosBaja')">
+      </app-datos-baja>
+
+      <app-informacion-descriptiva-baja 
+        [formGroup]="deregisterForm"
+        [isExpanded]="sections.informacionDescriptiva"
+        (toggle)="toggleSection('informacionDescriptiva')">
+      </app-informacion-descriptiva-baja>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit" id="submitBtn">
+        Dar de baja
+      </button>
+      <button type="button" class="btn-reset" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

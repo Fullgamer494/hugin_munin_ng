@@ -1,0 +1,26 @@
+<section class="form-section" [formGroup]="formGroup">
+  <header class="form-section-header">
+    <button type="button" class="toggle-btn" 
+            [attr.aria-expanded]="isExpanded"
+            (click)="onToggle()">
+      <span class="toggle-icon">
+        <i class="ti ti-chevron-down"></i>
+      </span>
+      <h2>Datos de la baja</h2>
+    </button>
+  </header>
+  <div class="form-section-body" [class.showed]="isExpanded">
+    <div class="form-group">
+      <label for="fecha_baja">Fecha de la baja:</label>
+      <input type="date" id="fecha_baja" formControlName="fecha_baja" required>
+    </div>
+    <div class="form-group">
+      <label for="causa_baja">Causa de la baja:</label>
+      <select id="causa_baja" formControlName="causa_baja">
+        <option *ngFor="let causa of causasBaja" [value]="causa.id">
+          {{ causa.name }}
+        </option>
+      </select>
+    </div>
+  </div>
+</section>
