@@ -1,0 +1,112 @@
+/* Variables locales del componente */
+:host {
+  --white: #FFFFFF;
+  --stroke: #818181;
+  --night: #0C0F0A;
+  
+  --spacing-sm: 0.625rem;
+  --spacing-lg: 1.875rem;
+  
+  --radius-sm: 0.5rem;
+}
+
+.login-section {
+  width: 100vw;
+  height: 100vh;
+  padding: 0 var(--spacing-sm);
+}
+
+.login-section-content {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.login-section__img {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.login-section__img h1 {
+  display: none;
+}
+
+.login-section__img img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.login-section__form {
+  width: 90%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  background-color: var(--white);
+  border-radius: var(--radius-sm);
+  z-index: 2000;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.welcome-content img {
+  width: 3rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.welcome-content h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.25rem;
+}
+
+.welcome-content p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.875rem;
+}
+
+@media screen and (min-width: 1024px) {
+  .login-section__img {
+    position: unset;
+    flex: 1;
+  }
+
+  .login-section__img img {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  }
+
+  .login-section__form {
+    flex: 1;
+    height: 100%;
+    border: 2px solid var(--stroke);
+    border-left: none;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+
+  .welcome-content img {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .welcome-content h2 {
+    font-size: 3rem;
+  }
+
+  .welcome-content p {
+    font-size: 1.25rem;
+  }
+}
