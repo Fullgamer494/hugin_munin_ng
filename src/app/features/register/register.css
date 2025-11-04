@@ -1,96 +1,3 @@
-
-:root {
-  --aside: #84BC0D;
-  --bg: #FBFBFB;
-  --header: #0C0F0A;
-  --stroke: #818181;
-  --green-font: #659400;
-  --nav-option-selected: #436300;
-  --green-btns: #A7D14D;
-  --night: #0C0F0A;
-  --main-green: #84BC0D;
-  --white: #FFFFFF;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
-}
-
-<<<<<<< Updated upstream
-body {
-  font-family: 'Montserrat', 'Poppins', sans-serif;
-  background-color: var(--bg);
-  color: var(--night);
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-ul {
-  list-style: none;
-}
-
-.app-layout {
-  display: grid;
-  grid-template-columns: 100vw;
-  grid-template-rows: 12vh 76vh 12vh;
-  min-height: 100vh;
-  background-color: var(--bg);
-}
-
-.app-layout app-navbar {
-  grid-column: 1/2;
-  grid-row: 1/2;
-}
-
-.app-layout app-sidebar {
-  grid-column: 1/2;
-  grid-row: 3/4;
-}
-
-.app-layout main {
-  grid-column: 1/2;
-  grid-row: 2/3;
-  padding: 0 clamp(8px, 10px, 10px);
-  overflow-y: auto;
-}
-
-@media screen and (min-width: 1024px) {
-  .app-layout {
-    grid-template-columns: clamp(11%, 10%, 11%) clamp(89%, 90%, 89%);
-    grid-template-rows: clamp(12vh, 14vh, 14vh) 88vh;
-  }
-
-  .app-layout app-navbar {
-    grid-column: 1/3;
-    grid-row: 1/2;
-  }
-
-  .app-layout app-sidebar {
-    grid-column: 1/2;
-    grid-row: 2/3;
-  }
-
-  .app-layout main {
-    grid-column: 2/3;
-    grid-row: 2/3;
-    margin: clamp(6px, 10px, 12px);
-    margin-left: 0;
-    padding: 15px 30px 0 30px;
-  }
-}
-
-@media screen and (min-width: 1300px) {
-  .app-layout {
-    grid-template-columns: clamp(9%, 8%, 9%) clamp(91%, 92%, 91%);
-  }
-}
-
 .main-content{
     display: flex;
     flex-direction: column;
@@ -100,7 +7,7 @@ ul {
 
     width: 100%;
     height: 100%;
-    padding: 10px 20px;
+    padding-top: 10px;
 
     border-radius: clamp(12px, 18px, 24px);
 }
@@ -138,12 +45,20 @@ ul {
     color: var(--stroke);
 }
 
+.breadcrumb-nav mat-icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+
+    color: var(--stroke);
+}
+
 .breadcrumb-nav a:last-child{
     color: var(--green-font);
 }
 
 .page-name h1{
-  padding-top: 20px;
     font-family: 'Montserrat';
     font-size: 28px;
     font-weight: 700;
@@ -161,20 +76,14 @@ ul {
     gap: 20px;
     
     width: 100%;
-    height: 100%;
 
     font-family: 'Poppins', sans-serif;
-}
-
-.form-sections-wrapper {
-    flex: 1;
-    overflow-y: auto;
 }
 
 .form-section {
     display: flex;
     flex-direction: column;
-    
+
     width: 100%;
 }
 
@@ -182,6 +91,7 @@ ul {
     display: flex;
     justify-content: start;
     align-items: center;
+
     width: 100%;
 }
 
@@ -202,8 +112,7 @@ ul {
 }
 
 .toggle-btn h2 {
-    margin-top: 15px;
-    font-size: 18px;
+    font-size: 16px;
     
     color: var(--stroke);
 
@@ -214,9 +123,11 @@ ul {
     color: var(--green-font);
 }
 
-.toggle-icon {
-    margin-top: 15px;
-
+.toggle-icon mat-icon{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    
     font-size: 20px;
 
     color: var(--stroke);
@@ -244,34 +155,6 @@ ul {
 
 .form-group {
     width: 100%;
-}
-
-.disabled-group {
-    width: 100%;
-}
-
-.disabled-group label {
-    font-family: 'Poppins';
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.disabled-group input {
-    width: 100%;
-    padding: 10px;
-    
-    border: var(--stroke) solid 1px;
-    border-radius: clamp(6px, 10px, 12px);
-    
-    background-color: #f5f5f5;
-    
-    font-family: 'Poppins';
-    font-size: 14px;
-    font-style: italic;
-    
-    color: var(--stroke);
-    
-    cursor: not-allowed;
 }
 
 .form-group label {
@@ -338,10 +221,11 @@ input[type="number"] {
 .form-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 10px;
 
     width: 100%;
-    margin-top: auto;
+    margin-top: 30px;
 }
 
 .form-actions button,
@@ -362,6 +246,11 @@ input[type="number"] {
     cursor: pointer;
 
     transition: 0.4s ease;
+}
+
+.btn-submit,
+.btn-reset {
+    grid-column: 1/3;
 }
 
 .btn-submit {
@@ -392,10 +281,9 @@ option{
     .form-notes{
         flex: 1;
     }
+
+    .btn-submit,
+    .btn-reset {
+        grid-column: auto;
+    }
 }
-=======
-    box-sizing: border-box;
-}
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
->>>>>>> Stashed changes
