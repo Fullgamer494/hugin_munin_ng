@@ -3,20 +3,20 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, Subject } from 'rxjs';
-import { GetReportByIdUseCase, UpdateReportUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
-import { SearchSpecimensUseCase } from '../../../../core/domain/ports/inbound/report/specimen.use-case';
-import { ReportEntity } from '../../../../core/domain/entities/report/report.entity';
-import { Specimen } from '../../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../../infrastructure/adapters/auth/auth.service';
+import { GetReportByIdUseCase, UpdateReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
+import { SearchSpecimensUseCase } from '../../../core/domain/ports/inbound/report/specimen.use-case';
+import { ReportEntity } from '../../../core/domain/entities/report/report.entity';
+import { Specimen } from '../../../core/domain/entities/report/report.entity';
+import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
 
 @Component({
   selector: 'app-report-edit',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, TitleCasePipe],
-  templateUrl: './report-edit.component.html',
-  styleUrl: './report-edit.component.css'
+  templateUrl: './report-edit.view.html',
+  styleUrl: './report-edit.view.css'
 })
-export class ReportEditComponent implements OnInit {
+export class ReportEditView implements OnInit  {
   reportId = signal<number | null>(null);
   reportType = signal<number>(1);
   reportTypeName = signal<string>('clínico');

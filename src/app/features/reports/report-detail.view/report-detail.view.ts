@@ -1,17 +1,17 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { GetReportByIdUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
-import { ReportEntity } from '../../../../core/domain/entities/report/report.entity';
+import { GetReportByIdUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
+import { ReportEntity } from '../../../core/domain/entities/report/report.entity';
 
 @Component({
-  selector: 'app-report-detail',
+  selector: 'app-report-detail-view',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './report-detail.component.html',
-  styleUrl: './report-detail.component.css'
+  templateUrl: './report-detail.view.html',
+  styleUrl: './report-detail.view.css'
 })
-export class ReportDetailComponent implements OnInit {
+export class ReportDetailView implements OnInit {
   report = signal<ReportEntity | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
@@ -30,7 +30,7 @@ export class ReportDetailComponent implements OnInit {
       if (this.reportId) {
         this.loadReport();
       } else {
-        this.error.set('No se especificó un ID de reporte válido');
+        this.error.set('No valid report ID specified');
       }
     });
   }
@@ -46,12 +46,12 @@ export class ReportDetailComponent implements OnInit {
         if (report) {
           this.report.set(report);
         } else {
-          this.error.set('Reporte no encontrado');
+          this.error.set('Report not found');
         }
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set('Error al cargar el reporte');
+        this.error.set('Error loading report');
         this.loading.set(false);
         console.error(err);
       }

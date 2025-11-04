@@ -3,19 +3,19 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, Subject } from 'rxjs';
-import { CreateReportUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
-import { SearchSpecimensUseCase } from '../../../../core/domain/ports/inbound/report/specimen.use-case';
-import { Specimen } from '../../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../../infrastructure/adapters/auth/auth.service';
+import { CreateReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
+import { SearchSpecimensUseCase } from '../../../core/domain/ports/inbound/report/specimen.use-case';
+import { Specimen } from '../../../core/domain/entities/report/report.entity';
+import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
 
 @Component({
   selector: 'app-report-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, TitleCasePipe],
-  templateUrl: './report-form.component.html',
-  styleUrl: './report-form.component.css'
+  templateUrl: './report-form.view.html',
+  styleUrl: './report-form.view.css'
 })
-export class ReportFormComponent implements OnInit {
+export class ReportFormView implements OnInit {
   reportType = signal<number>(1);
   reportTypeName = signal<string>('clínico');
   

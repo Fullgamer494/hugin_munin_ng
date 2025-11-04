@@ -2,18 +2,18 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { GetReportsBySpecimenUseCase, DeleteReportUseCase } from '../../../../core/domain/ports/inbound/report/report.use-case';
-import { ReportEntity } from '../../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../../infrastructure/adapters/auth/auth.service';
+import { GetReportsBySpecimenUseCase, DeleteReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
+import { ReportEntity } from '../../../core/domain/entities/report/report.entity';
+import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
 
 @Component({
   selector: 'app-report-history',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './report-history.component.html',
-  styleUrl: './report-history.component.css'
+  templateUrl: './report-history.view.html',
+  styleUrl: './report-history.view.css'
 })
-export class ReportHistoryComponent implements OnInit {
+export class ReportHistoryView implements OnInit {
   reports = signal<ReportEntity[]>([]);
   filteredReports = signal<ReportEntity[]>([]);
   paginatedReports = signal<ReportEntity[]>([]);
