@@ -59,8 +59,8 @@ fun Route.authorized(vararg allowedRoles: AppRole, build: Route.() -> Unit) {
             if (userRole == null || !allowedRoles.contains(userRole)) {
                 call.respond(
                     HttpStatusCode.Forbidden, mapOf(
-                        "error" to "Acceso Denegado",
-                        "message" to "Tu rol '${userRole ?: "Desconocido"}' no tiene permiso para esta acción."
+                        "error" to "Acceso denegado",
+                        "message" to "Tu rol '${userRole ?: "Desconocido"}' no se tiene permiso para esta acción."
                     )
                 )
                 finish()
