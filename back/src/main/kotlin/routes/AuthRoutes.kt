@@ -11,6 +11,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import java.util.*
+import org.jetbrains.exposed.sql.*
 
 // Modelos de datos (DTOs)
 @Serializable
