@@ -1,83 +1,127 @@
 <div class="main-content">
-        <header class="main-header">
-            <div class="page-name">
-                <nav class="breadcrumb-nav">
-                    <a routerLink="animals">Animales</a>
-                </nav>
-                <h1>Mamíferos activos</h1>
+    <header class="main-header">
+        <div class="page-name">
+            <nav class="breadcrumb-nav">
+                <a routerLink="animals">Animales</a>
+            </nav>
+            <h1>Mamíferos activos</h1>
+        </div>
+        <div class="new-animal-btn">
+            <a routerLink="register_animal">
+                <span>Nuevo ejemplar</span>
+                <mat-icon>add</mat-icon>
+            </a>
+        </div>
+    </header>
+    <section class="controls">
+        <div class="search-container">
+            <label for="searchInput">
+                <mat-icon>search</mat-icon>
+            </label>
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="Buscar..."
+                (input)="onSearch($event)">
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="sortSelect">Ordenar por</label>
+                <select 
+                    class="filter-select" 
+                    id="sortSelect"
+                    (change)="onSortChange($event)">
+                    <option value="identificador">Identificador</option>
+                    <option value="genero">Género</option>
+                    <option value="especie">Especie</option>
+                    <option value="fecha">Fecha de ingreso</option>
+                </select>
             </div>
-            <div class="new-animal-btn">
-                <a routerLink="register_animal">
-                    <span>Nuevo ejemplar</span>
-                    <mat-icon>add</mat-icon>
-                </a>
-            </div>
-        </header>
-        <section class="controls">
-            <div class="search-container">
-                <label for="searchInput">
-                    <mat-icon>search</mat-icon>
-                </label>
-                <input type="text" class="search-input" id="searchInput" placeholder="Buscar...">
-            </div>
-            <div class="filters">
-                <div class="filter-group">
-                    <label for="sortSelect">Ordenar por</label>
-                    <select class="filter-select" id="sortSelect">
-                        <option value="identificador">Identificador</option>
-                        <option value="genero">Género</option>
-                        <option value="especie">Especie</option>
-                        <option value="fecha">Fecha de ingreso</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-        <section class="main-body">
-            <div class="table-container">
-                <table class="table" id="mammalsTable">
-                    <thead>
-                        <tr>
-                            <th>Identificador</th>
-                            <th>Género</th>
-                            <th>Especie</th>
-                            <th>Origen</th>
-                            <th>Procedencia</th>
-                            <th>Fecha de ingreso</th>
-                            <th>Área</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mammalsTableBody">
-                    </tbody>
-                </table>
-            </div>
+        </div>
+    </section>
+    <section class="main-body">
+        <div class="table-container">
+            <table class="table" id="mammalsTable">
+                <thead>
+                    <tr>
+                        <th>Identificador</th>
+                        <th>Género</th>
+                        <th>Especie</th>
+                        <th>Origen</th>
+                        <th>Procedencia</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Área</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="mammalsTableBody">
+                    <tr *ngFor="let animal of animalesFiltrados">
+                        <td>{{ animal.numInventario }}</td>
+                        <td>{{ animal.genero }}</td>
+                        <td>{{ animal.especie }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>{{ animal.fechaNacimiento || 'N/A' }}</td>
+                        <td>-</td>
+                        <td class="actions-cell">
+                            <button class="actions-btn" (click)="toggleMenu($event)">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <div class="actions-menu">
+                                <a [routerLink]="['/edit', animal.id]">
+                                    <mat-icon>edit</mat-icon>
+                                    <span>Editar</span>
+                                </a>
+                                <button (click)="deleteAnimal(animal.id)">
+                                    <mat-icon>delete</mat-icon>
+                                    <span>Eliminar</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <div class="pagination">
-                <div class="pagination-info">
-                    <span id="paginationInfo">1-10 de 350 items</span>
-                    <select class="pagination-filter-select" id="itemsPerPage">
-                        <option value="10">10 por página</option>
-                        <option value="25">25 por página</option>
-                        <option value="50">50 por página</option>
-                        <option value="100">100 por página</option>
-                    </select>
-                </div>
-                
-                <div class="pagination-controls">
-                    <button class="page-btn" id="prevBtn" disabled>
-                        <mat-icon>keyboard_arrow_left</mat-icon>
-                    </button>
-                    <button class="page-btn active" data-page="1">1</button>
-                    <button class="page-btn" data-page="2">2</button>
-                    <button class="page-btn" data-page="3">3</button>
-                    <button class="page-btn" data-page="4">4</button>
-                    <button class="page-btn" data-page="5">5</button>
-                    <span>...</span>
-                    <button class="page-btn" data-page="16">16</button>
-                    <button class="page-btn" id="nextBtn">
-                        <mat-icon>keyboard_arrow_right</mat-icon>
-                    </button>
-                </div>
+        <div class="pagination">
+            <div class="pagination-info">
+                <span id="paginationInfo">{{ getPaginationInfo() }}</span>
+                <select 
+                    class="pagination-filter-select" 
+                    id="itemsPerPage"
+                    (change)="onItemsPerPageChange($event)">
+                    <option value="10">10 por página</option>
+                    <option value="25">25 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                </select>
             </div>
-        </section>
-    </div>
+            
+            <div class="pagination-controls">
+                <button 
+                    class="page-btn" 
+                    id="prevBtn" 
+                    [disabled]="currentPage === 0"
+                    (click)="previousPage()">
+                    <mat-icon>keyboard_arrow_left</mat-icon>
+                </button>
+                <button 
+                    *ngFor="let page of [].constructor(totalPages > 0 ? totalPages : 1); let i = index"
+                    class="page-btn"
+                    [class.active]="i === currentPage"
+                    [attr.data-page]="i + 1"
+                    (click)="goToPage(i)">
+                    {{ i + 1 }}
+                </button>
+                <button 
+                    class="page-btn" 
+                    id="nextBtn"
+                    [disabled]="currentPage >= totalPages - 1"
+                    (click)="nextPage()">
+                    <mat-icon>keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+        </div>
+    </section>
+</div>

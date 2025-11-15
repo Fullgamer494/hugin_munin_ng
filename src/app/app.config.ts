@@ -54,5 +54,8 @@ export const appConfig: ApplicationConfig = {
     
     { provide: SearchSpecimensUseCase, useClass: SearchSpecimensService },
     { provide: GetSpecimenByIdUseCase, useClass: GetSpecimenByIdService }
+
+    
   ]
 };
+

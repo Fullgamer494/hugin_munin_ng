@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:4200' //Aquí lo cambiaremos a la API de Ktor
+  apiUrl: 'http://localhost:8080' //Aquí lo cambiaremos a la API de Ktor
 };
