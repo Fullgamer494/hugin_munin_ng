@@ -1,0 +1,15 @@
+git ktor:
+  application:
+    modules:
+      - com.hugin_munin.ApplicationKt.module
+
+  deployment:
+    port: 8080
+
+database:
+  driver: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/hugin_munin
+  user: postgres
+  password: YOUR_PASSWORD_HERE (Acá la contraseña de PostrgreSQL)
+  maxPoolSize: 10
+  createTables: false
