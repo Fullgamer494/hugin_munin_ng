@@ -1,0 +1,97 @@
+<div class="container">
+  <div class="form-card">
+    <h2>Registrar Baja</h2>
+
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="deregisterForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="specimenId">Espécimen *</label>
+        <select 
+          id="specimenId" 
+          formControlName="specimenId"
+          [class.invalid]="isFieldInvalid('specimenId')">
+          <option value="">Seleccione un espécimen</option>
+          <option *ngFor="let specimen of specimens" [value]="specimen.id">
+            {{ specimen.inventoryNumber }} - {{ specimen.specimenName }}
+          </option>
+        </select>
+        <span class="error-message" *ngIf="isFieldInvalid('specimenId')">
+          {{ getErrorMessage('specimenId') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="causeId">Causa de Baja *</label>
+        <select 
+          id="causeId" 
+          formControlName="causeId"
+          [class.invalid]="isFieldInvalid('causeId')">
+          <option value="">Seleccione una causa</option>
+          <option *ngFor="let cause of causes" [value]="cause.id">
+            {{ cause.causeName }}
+          </option>
+        </select>
+        <span class="error-message" *ngIf="isFieldInvalid('causeId')">
+          {{ getErrorMessage('causeId') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="deregistrationDate">Fecha de Baja *</label>
+        <input 
+          type="date" 
+          id="deregistrationDate" 
+          formControlName="deregistrationDate"
+          [class.invalid]="isFieldInvalid('deregistrationDate')">
+        <span class="error-message" *ngIf="isFieldInvalid('deregistrationDate')">
+          {{ getErrorMessage('deregistrationDate') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="destination">Destino</label>
+        <input 
+          type="text" 
+          id="destination" 
+          formControlName="destination"
+          placeholder="Ingrese el destino"
+          [class.invalid]="isFieldInvalid('destination')">
+        <span class="error-message" *ngIf="isFieldInvalid('destination')">
+          {{ getErrorMessage('destination') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="observations">Observaciones</label>
+        <textarea 
+          id="observations" 
+          formControlName="observations"
+          rows="4"
+          placeholder="Observaciones adicionales"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="onCancel()"
+          [disabled]="loading">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="loading">
+          {{ loading ? 'Guardando...' : 'Guardar Baja' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
