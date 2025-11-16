@@ -3,6 +3,7 @@ package com.hugin_munin.routes
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.hugin_munin.infrastructure.database.DatabaseFactory.dbQuery
+import com.hugin_munin.infrastructure.services.*
 import com.hugin_munin.infrastructure.database.tables.Roles
 import com.hugin_munin.infrastructure.database.tables.Users
 import io.ktor.http.*
