@@ -33,4 +33,19 @@ dependencies {
 
     //Extra dependencies
     implementation("com.zaxxer:HikariCP:7.0.2")
+
+
+    val exposed_version = "0.51.1"
+
+    implementation("org.jetbrains.exposed:exposed-core:${exposed_version}")
+    implementation("org.jetbrains.exposed:exposed-dao:${exposed_version}")
+    implementation("org.jetbrains.exposed:exposed-jdbc:${exposed_version}")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:${exposed_version}")
+
+    implementation("org.jetbrains.exposed:exposed-java-time:${exposed_version}")
+
+    val ktor_version = ""
+    implementation("io.ktor:ktor-server-content-negotiation:${ktor_version}")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:${ktor_version}")
+    implementation("io.ktor:ktor-server-cors:${ktor_version}")
 }
