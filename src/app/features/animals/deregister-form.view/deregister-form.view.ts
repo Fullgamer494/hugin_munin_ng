@@ -81,22 +81,21 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   }
 
   loadSpecimenData(): void {
-    console.log('🔍 Cargando datos del animal ID:', this.specimenId);
+    console.log('Cargando datos del animal ID:', this.specimenId);
 
     this.http.get<SpecimenData>(`${this.apiUrl}/api/specimens/${this.specimenId}`)
       .subscribe({
         next: (data) => {
-          console.log('✅ Datos del animal cargados:', data);
+          console.log('Datos del animal cargados:', data);
           this.specimenData = data;
           this.isLoading = false;
 
-          // Rellenar los campos del formulario
           setTimeout(() => {
             this.fillFormFields();
           }, 100);
         },
         error: (err) => {
-          console.error('❌ Error al cargar datos del animal:', err);
+          console.error('Error al cargar datos del animal:', err);
           this.error = 'No se pudo cargar la información del animal';
           this.isLoading = false;
           
@@ -117,7 +116,6 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     if (generoInput) generoInput.value = this.specimenData.genus;
     if (especieInput) especieInput.value = this.specimenData.species;
 
-    // Establecer la fecha actual por defecto
     const fechaBajaInput = document.getElementById('fecha_baja') as HTMLInputElement;
     if (fechaBajaInput) {
       fechaBajaInput.value = new Date().toISOString().split('T')[0];
@@ -187,7 +185,6 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
     const formData = new FormData(form);
 
-    // Validar que la fecha no esté vacía
     const fechaBaja = formData.get('fecha_baja') as string;
     if (!fechaBaja) {
       alert('Por favor selecciona la fecha de baja');
@@ -197,9 +194,8 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     const causaBaja = parseInt(formData.get('causa_baja') as string);
     const observaciones = formData.get('observaciones_baja') as string;
 
-    // Confirmar antes de dar de baja
     const causasNombres = [
-      '', // índice 0 vacío
+      '',
       'Aprovechamiento',
       'Cambio de depositaría',
       'Fuga',
@@ -227,19 +223,19 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     const deregistrationData: DeregistrationRequest = {
       specimenId: this.specimenId,
       causeId: causaBaja,
-      registeredBy: 1, // Usuario actual (ajustar según tu sistema de auth)
+      registeredBy: 1, 
       deregistrationDate: fechaBaja,
       observations: observaciones || undefined
     };
 
-    console.log('🗑️ Enviando registro de baja:', deregistrationData);
+    console.log('Enviando registro de baja:', deregistrationData);
 
     this.http.post<{ id: number }>(
       `${this.apiUrl}/api/deregistrations`,
       deregistrationData
     ).subscribe({
       next: (response) => {
-        console.log('✅ Registro de baja creado con ID:', response.id);
+        console.log('Registro de baja creado con ID:', response.id);
         
         alert(
           `Animal dado de baja exitosamente\n\n` +
@@ -248,11 +244,10 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
           `Registro de baja ID: ${response.id}`
         );
 
-        // Redirigir a la tabla de animales
         this.router.navigate(['/animals']);
       },
       error: (err) => {
-        console.error('❌ Error al crear registro de baja:', err);
+        console.error('Error al crear registro de baja:', err);
         console.error('Detalles:', err.error);
         
         let errorMessage = 'No se pudo dar de baja el animal';

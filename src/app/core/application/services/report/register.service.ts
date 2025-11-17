@@ -26,7 +26,7 @@ export class CreateRegistroAltaService extends CreateRegistroAltaUseCase {
     super();
   }
 
-  execute(data: RegistroAltaRequest): Observable<{ id: number }> {  // ← Cambio aquí
+  execute(data: RegistroAltaRequest): Observable<{ id: number }> { 
     return this.repository.createRegistroAlta(data);
   }
 }
