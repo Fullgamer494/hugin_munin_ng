@@ -11,14 +11,3 @@ data class ReporteConductual(
     val fechaReporte: LocalDate,
     val contenido: String
 )
-
-data class RegistroComportamiento(
-    val idRegistro: Int?,
-    val idEspecimen: Int,
-    val idObservador: Int,
-    val idCategoria: Int,
-    val fechaObservacion: LocalDate,
-    val horaInicio: String,
-    val duracionMinutos: Int,
-    val observaciones: String?
-)
