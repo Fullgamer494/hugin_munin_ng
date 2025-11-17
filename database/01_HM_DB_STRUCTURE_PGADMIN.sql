@@ -43,23 +43,6 @@ CREATE TABLE especimen(
     activo BOOLEAN DEFAULT TRUE
 );
 
--- REGISTRO DE ALTA
-CREATE TABLE origen_alta(
-    id_origen_alta SERIAL PRIMARY KEY,
-    nombre_origen_alta VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE registro_alta(
-    id_registro_alta SERIAL PRIMARY KEY,
-    id_especimen INT NOT NULL UNIQUE REFERENCES especimen(id_especimen),
-    id_origen_alta INT NOT NULL REFERENCES origen_alta(id_origen_alta),
-    id_responsable INT NOT NULL REFERENCES usuario(id_usuario),
-    fecha_ingreso DATE,
-    procedencia VARCHAR(100),
-    observacion TEXT,
-	id_reporte_traslado INT UNIQUE REFERENCES reporte(id_reporte)
-);
-
 -- REGISTRO DE BAJA
 CREATE TABLE causa_baja(
     id_causa_baja SERIAL PRIMARY KEY,
@@ -124,6 +107,23 @@ CREATE TABLE reporte_traslado(
     ubicacion_origen VARCHAR(100) NOT NULL,
     ubicacion_destino VARCHAR(100) NOT NULL,
     motivo TEXT
+);
+
+-- REGISTRO DE ALTA
+CREATE TABLE origen_alta(
+    id_origen_alta SERIAL PRIMARY KEY,
+    nombre_origen_alta VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE registro_alta(
+    id_registro_alta SERIAL PRIMARY KEY,
+    id_especimen INT NOT NULL UNIQUE REFERENCES especimen(id_especimen),
+    id_origen_alta INT NOT NULL REFERENCES origen_alta(id_origen_alta),
+    id_responsable INT NOT NULL REFERENCES usuario(id_usuario),
+    fecha_ingreso DATE,
+    procedencia VARCHAR(100),
+    observacion TEXT,
+	id_reporte_traslado INT UNIQUE REFERENCES reporte(id_reporte)
 );
 
 -- 4. TRIGGERS DE PREVENCIÓN DE DEFUNCIÓN (PostgreSQL)
