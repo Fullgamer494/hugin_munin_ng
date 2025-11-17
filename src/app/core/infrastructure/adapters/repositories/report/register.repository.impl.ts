@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../../../environments/environment';
 import {
   RegistroAltaRequest,
   RegistroAltaResponse,
   EspecieRequest,
   EspecieResponse
-} from '../../../../features/animals/register-form.view/register.model';
+} from '../../../../../features/animals/register-form.view/register.model';
 
 export abstract class RegistrationRepository {
   abstract createEspecie(data: EspecieRequest): Observable<{ id: number }>;
@@ -34,9 +34,9 @@ export class RegistrationRepositoryImpl extends RegistrationRepository {
 
   createEspecie(data: EspecieRequest): Observable<{ id: number }> {
     const request = {
-      genus: data.genero,
-      species: data.especie,
-      commonName: data.nombreComun
+      genus: data.genus,
+      species: data.species,
+      commonName: data.commonName
     };
     
     console.log('📡 POST /api/species:', request);
@@ -51,9 +51,9 @@ export class RegistrationRepositoryImpl extends RegistrationRepository {
     return this.http.get<any[]>(`${this.apiUrl}/api/species`).pipe(
       map(species => species.map(s => ({
         id: s.id,
-        genero: s.genus,
-        especie: s.species,
-        nombreComun: s.commonName
+        genus: s.genus,
+        species: s.species,
+        commonName: s.commonName
       })))
     );
   }
@@ -62,21 +62,23 @@ export class RegistrationRepositoryImpl extends RegistrationRepository {
     return this.http.get<any>(`${this.apiUrl}/api/species/${id}`).pipe(
       map(s => ({
         id: s.id,
-        genero: s.genus,
-        especie: s.species,
-        nombreComun: s.commonName
+        genus: s.genus,
+        species: s.species,
+        commonName: s.commonName
       }))
     );
   }
 
   createRegistroAlta(data: RegistroAltaRequest): Observable<{ id: number }> {
+    // ✅ SOLO enviamos los campos que existen en tu BD actual
     const request = {
-      specimenId: data.idEspecimen,
-      originId: data.idOrigenAlta,
-      registeredBy: data.idResponsable,
-      registrationDate: data.fechaIngreso,
-      origin: data.procedencia || null,
-      observations: data.observacion || null
+      specimenId: data.specimenId,
+      originId: data.originId,
+      registeredBy: data.registeredBy,
+      registrationDate: data.registrationDate,
+      origin: data.origin || null,
+      observations: data.observations || null
+      // ❌ NO enviamos: originArea, destinationArea, originLocation, destinationLocation
     };
 
     console.log('📡 POST /api/registrations:', request);
@@ -101,15 +103,12 @@ export class RegistrationRepositoryImpl extends RegistrationRepository {
 
   updateRegistroAlta(id: number, data: RegistroAltaRequest): Observable<{ message: string }> {
     const request = {
-      specimenId: data.idEspecimen,
-      originId: data.idOrigenAlta,
-      registeredBy: data.idResponsable,
-      registrationDate: data.fechaIngreso,
-      guideNumber: null,
-      origin: data.procedencia || null,
-      arrivalCondition: null,
-      observations: data.observacion || null,
-      documentFile: null
+      specimenId: data.specimenId,
+      originId: data.originId,
+      registeredBy: data.registeredBy,
+      registrationDate: data.registrationDate,
+      origin: data.origin || null,
+      observations: data.observations || null
     };
 
     return this.http.put<{ message: string }>(
@@ -126,21 +125,21 @@ export class RegistrationRepositoryImpl extends RegistrationRepository {
 
   private mapRegistrationResponse(r: any): RegistroAltaResponse {
     return {
-      idRegistroAlta: r.id,
-      idEspecimen: r.specimenId,
-      numInventario: r.inventoryNumber,
-      nombreEspecimen: r.specimenName,
-      genero: r.genus,
-      especie: r.species,
-      nombreComun: r.commonName,
-      sexo: null,
-      fechaNacimiento: null,
-      nombreOrigenAlta: r.originName,
-      nombreResponsable: r.registeredByName,
-      fechaIngreso: r.registrationDate,
-      procedencia: r.origin,
-      observacion: r.observations,
-      fechaRegistro: r.registrationDate
+      id: r.id,
+      specimenId: r.specimenId,
+      inventoryNumber: r.inventoryNumber,
+      specimenName: r.specimenName,
+      genus: r.genus,
+      species: r.species,
+      commonName: r.commonName,
+      sex: null,
+      birthDate: null,
+      originName: r.originName,
+      registeredByName: r.registeredByName,
+      registrationDate: r.registrationDate,
+      origin: r.origin,
+      observations: r.observations,
+      createdAt: r.createdAt || r.registrationDate
     };
   }
 }

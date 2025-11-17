@@ -174,99 +174,100 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   }
 
   onSubmit(event: Event): void {
-    event.preventDefault();
-    
-    if (!this.specimenData) {
-      alert('Error: No se han cargado los datos del animal');
-      return;
-    }
-
-    const form = event.target as HTMLFormElement;
-    const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
-    const formData = new FormData(form);
-
-    const fechaBaja = formData.get('fecha_baja') as string;
-    if (!fechaBaja) {
-      alert('Por favor selecciona la fecha de baja');
-      return;
-    }
-
-    const causaBaja = parseInt(formData.get('causa_baja') as string);
-    const observaciones = formData.get('observaciones_baja') as string;
-
-    const causasNombres = [
-      '',
-      'Aprovechamiento',
-      'Cambio de depositaría',
-      'Fuga',
-      'Deceso',
-      'Préstamo',
-      'Liberación',
-      'Entrega a PROFEPA'
-    ];
-
-    const confirmed = confirm(
-      `¿Confirmas dar de baja el siguiente animal?\n\n` +
-      `Identificador: ${this.specimenData.inventoryNumber}\n` +
-      `Nombre: ${this.specimenData.specimenName}\n` +
-      `Especie: ${this.specimenData.genus} ${this.specimenData.species}\n\n` +
-      `Causa: ${causasNombres[causaBaja]}\n` +
-      `Fecha: ${fechaBaja}\n\n` +
-      'Esta acción marcará al animal como inactivo y creará un registro de baja.'
-    );
-
-    if (!confirmed) return;
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Procesando...';
-
-    const deregistrationData: DeregistrationRequest = {
-      specimenId: this.specimenId,
-      causeId: causaBaja,
-      registeredBy: 1, 
-      deregistrationDate: fechaBaja,
-      observations: observaciones || undefined
-    };
-
-    console.log('Enviando registro de baja:', deregistrationData);
-
-    this.http.post<{ id: number }>(
-      `${this.apiUrl}/api/deregistrations`,
-      deregistrationData
-    ).subscribe({
-      next: (response) => {
-        console.log('Registro de baja creado con ID:', response.id);
-        
-        alert(
-          `Animal dado de baja exitosamente\n\n` +
-          `Identificador: ${this.specimenData!.inventoryNumber}\n` +
-          `Causa: ${causasNombres[causaBaja]}\n` +
-          `Registro de baja ID: ${response.id}`
-        );
-
-        this.router.navigate(['/animals']);
-      },
-      error: (err) => {
-        console.error('Error al crear registro de baja:', err);
-        console.error('Detalles:', err.error);
-        
-        let errorMessage = 'No se pudo dar de baja el animal';
-        
-        if (err.error?.error) {
-          errorMessage = err.error.error;
-        } else if (err.error?.message) {
-          errorMessage = err.error.message;
-        } else if (err.message) {
-          errorMessage = err.message;
-        }
-        
-        alert(`Error: ${errorMessage}`);
-        
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Dar de baja';
-      }
-    });
+  event.preventDefault();
+  
+  if (!this.specimenData) {
+    alert('Error: No se han cargado los datos del animal');
+    return;
   }
+
+  const form = event.target as HTMLFormElement;
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+  const formData = new FormData(form);
+
+  const fechaBaja = formData.get('fecha_baja') as string;
+  if (!fechaBaja) {
+    alert('Por favor selecciona la fecha de baja');
+    return;
+  }
+
+  const causaBaja = parseInt(formData.get('causa_baja') as string);
+  const observaciones = formData.get('observaciones_baja') as string;
+
+  const causasNombres = [
+    '',
+    'Aprovechamiento',
+    'Cambio de depositaría',
+    'Fuga',
+    'Deceso',
+    'Préstamo',
+    'Liberación',
+    'Entrega a PROFEPA'
+  ];
+
+  const confirmed = confirm(
+    `¿Confirmas dar de baja el siguiente animal?\n\n` +
+    `Identificador: ${this.specimenData.inventoryNumber}\n` +
+    `Nombre: ${this.specimenData.specimenName}\n` +
+    `Especie: ${this.specimenData.genus} ${this.specimenData.species}\n\n` +
+    `Causa: ${causasNombres[causaBaja]}\n` +
+    `Fecha: ${fechaBaja}\n\n` +
+    'Esta acción marcará al animal como inactivo y creará un registro de baja.'
+  );
+
+  if (!confirmed) return;
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Procesando...';
+
+  // ✅ CAMPOS CORREGIDOS para coincidir con el backend
+  const deregistrationData: DeregistrationRequest = {
+    specimenId: this.specimenId,        // ✅ CORREGIDO
+    causeId: causaBaja,                 // ✅ CORREGIDO
+    registeredBy: 1,                    // ✅ CORREGIDO
+    deregistrationDate: fechaBaja,      // ✅ CORREGIDO
+    observations: observaciones || undefined // ✅ CORREGIDO
+  };
+
+  console.log('Enviando registro de baja:', deregistrationData);
+
+  this.http.post<{ id: number }>(
+    `${this.apiUrl}/api/deregistrations`,
+    deregistrationData
+  ).subscribe({
+    next: (response) => {
+      console.log('Registro de baja creado con ID:', response.id);
+      
+      alert(
+        `Animal dado de baja exitosamente\n\n` +
+        `Identificador: ${this.specimenData!.inventoryNumber}\n` +
+        `Causa: ${causasNombres[causaBaja]}\n` +
+        `Registro de baja ID: ${response.id}`
+      );
+
+      this.router.navigate(['/animals']);
+    },
+    error: (err) => {
+      console.error('Error al crear registro de baja:', err);
+      console.error('Detalles:', err.error);
+      
+      let errorMessage = 'No se pudo dar de baja el animal';
+      
+      if (err.error?.error) {
+        errorMessage = err.error.error;
+      } else if (err.error?.message) {
+        errorMessage = err.error.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      alert(`Error: ${errorMessage}`);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Dar de baja';
+    }
+  });
+}
 
   onFieldBlur(event: Event): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;

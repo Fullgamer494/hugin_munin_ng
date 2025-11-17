@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { ReportRepository, CreateReportDto, UpdateReportDto } from '../../../../core/domain/ports/outbound/report/report.repository';
-import { ReportEntity } from '../../../../core/domain/entities/report/report.entity';
-import { environment } from '../../../../../environments/environment';
+import { ReportRepository, CreateReportDto, UpdateReportDto } from '../../../../../core/domain/ports/outbound/report/report.repository';
+import { ReportEntity } from '../../../../domain/entities/report/report.entity';
+import { environment } from '../../../../../../environments/environment';
 
 interface ApiResponse<T> {
   data: T;

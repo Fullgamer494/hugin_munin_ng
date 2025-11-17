@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { GetReportsBySpecimenUseCase, DeleteReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
 import { ReportEntity } from '../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
+import { AuthService } from '../../../core/infrastructure/adapters/auth/auth.service';
 import { MatIcon } from "@angular/material/icon";
 
 @Component({

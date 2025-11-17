@@ -6,7 +6,7 @@ import { debounceTime, Subject } from 'rxjs';
 import { CreateReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
 import { SearchSpecimensUseCase } from '../../../core/domain/ports/inbound/report/specimen.use-case';
 import { Specimen } from '../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
+import { AuthService } from '../../../core/infrastructure/adapters/auth/auth.service';
 import { MatIcon } from "@angular/material/icon";
 
 @Component({

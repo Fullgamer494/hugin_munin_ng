@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { SpecimenRepository } from '../../../../core/domain/ports/outbound/report/specimen.repository';
-import { Specimen } from '../../../../core/domain/entities/report/report.entity';
-import { environment } from '../../../../../environments/environment';
+import { SpecimenRepository } from '../../../../../core/domain/ports/outbound/report/specimen.repository';
+import { Specimen } from '../../../../../core/domain/entities/report/report.entity';
+import { environment } from '../../../../../../environments/environment';
 
 interface ApiResponse<T> {
   data: T;

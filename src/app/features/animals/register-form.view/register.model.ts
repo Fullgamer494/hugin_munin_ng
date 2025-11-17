@@ -1,42 +1,58 @@
+// ============================================
+// INTERFACES PARA REGISTRO DE ALTA
+// ============================================
+
 export interface RegistroAltaRequest {
-  idEspecimen: number; 
-  idOrigenAlta: number;
-  idResponsable: number;
-  fechaIngreso: string; 
-  procedencia?: string;
-  observacion?: string;
+  specimenId: number;
+  originId: number;
+  registeredBy: number;
+  registrationDate: string;
+  origin?: string;
+  observations?: string;
+  originArea?: string;
+  destinationArea?: string;
+  originLocation?: string;
+  destinationLocation?: string;
 }
 
 export interface RegistroAltaResponse {
-  idRegistroAlta: number;
-  idEspecimen: number;
-  numInventario: string;
-  nombreEspecimen: string;
-  genero: string;
-  especie: string;
-  nombreComun: string | null;
-  sexo: string | null;
-  fechaNacimiento: string | null;
-  nombreOrigenAlta: string;
-  nombreResponsable: string;
-  fechaIngreso: string;
-  procedencia: string | null;
-  observacion: string | null;
-  fechaRegistro: string;
+  id: number;
+  specimenId: number;
+  inventoryNumber: string;
+  specimenName: string;
+  genus: string;
+  species: string;
+  commonName: string | null;
+  sex: string | null;
+  birthDate: string | null;
+  originName: string;
+  registeredByName: string;
+  registrationDate: string;
+  origin: string | null;
+  observations: string | null;
+  createdAt: string;
 }
 
+// ============================================
+// INTERFACES PARA ESPECIES
+// ============================================
+
 export interface EspecieRequest {
-  genero: string;
-  especie: string;
-  nombreComun?: string | null;
+  genus: string;
+  species: string;
+  commonName?: string | null;
 }
 
 export interface EspecieResponse {
   id: number;
-  genero: string;
-  especie: string;
-  nombreComun: string | null;
+  genus: string;
+  species: string;
+  commonName: string | null;
 }
+
+// ============================================
+// INTERFACES PARA ORIGEN DE ALTA
+// ============================================
 
 export interface OrigenAlta {
   id: number;

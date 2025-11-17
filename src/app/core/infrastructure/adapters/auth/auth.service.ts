@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CookieService } from '../storage/cookie.service';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../../environments/environment';
 
 interface AuthResponse {
   token: string;

@@ -112,20 +112,22 @@ export class RegisterFormView implements AfterViewInit {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
 
-    console.log('INICIANDO PROCESO DE REGISTRO');
+    console.log('🚀 INICIANDO PROCESO DE REGISTRO');
 
+    // 1️⃣ Crear especie
     const especieData: EspecieRequest = {
-      genero: formData.get('genero') as string,
-      especie: formData.get('especie') as string,
-      nombreComun: null
+      genus: formData.get('genero') as string,
+      species: formData.get('especie') as string,
+      commonName: null
     };
 
-    console.log('Creando especie:', especieData);
+    console.log('1️⃣ Creando especie:', especieData);
 
     this.createEspecieUseCase.execute(especieData).pipe(
       switchMap((especieResponse) => {
-        console.log('Especie creada con ID:', especieResponse.id);
+        console.log('✅ Especie creada con ID:', especieResponse.id);
 
+        // 2️⃣ Crear specimen
         const specimenData: SpecimenRequest = {
           inventoryNumber: formData.get('NI_animal') as string,
           speciesId: especieResponse.id,
@@ -134,7 +136,7 @@ export class RegisterFormView implements AfterViewInit {
           birthDate: null
         };
 
-        console.log('Creando specimen:', specimenData);
+        console.log('2️⃣ Creando specimen:', specimenData);
 
         return this.http.post<{ id: number }>(
           `${this.apiUrl}/api/specimens`,
@@ -142,25 +144,30 @@ export class RegisterFormView implements AfterViewInit {
         );
       }),
       switchMap((specimenResponse) => {
-        console.log('Specimen creado con ID:', specimenResponse.id);
+        console.log('✅ Specimen creado con ID:', specimenResponse.id);
 
+        // 3️⃣ Crear registro de alta con TODOS los campos
         const registrationData: RegistroAltaRequest = {
-          idEspecimen: specimenResponse.id,
-          idOrigenAlta: parseInt(formData.get('id_origen') as string),
-          idResponsable: 1, 
-          fechaIngreso: formData.get('fecha_ingreso') as string,
-          procedencia: formData.get('procedencia') as string || undefined,
-          observacion: formData.get('observaciones_ingreso') as string || undefined
+          specimenId: specimenResponse.id,
+          originId: parseInt(formData.get('id_origen') as string),
+          registeredBy: 1, // TODO: Obtener del usuario autenticado
+          registrationDate: formData.get('fecha_ingreso') as string,
+          origin: formData.get('procedencia') as string || undefined,
+          observations: formData.get('observaciones_ingreso') as string || undefined,
+          originArea: formData.get('area_origen') as string || undefined,
+          destinationArea: formData.get('area_destino') as string || undefined,
+          originLocation: formData.get('ubicacion_origen') as string || undefined,
+          destinationLocation: formData.get('ubicacion_destino') as string || undefined
         };
 
-        console.log('3️Creando registro de alta:', registrationData);
+        console.log('3️⃣ Creando registro de alta:', registrationData);
 
         return this.createRegistroAltaUseCase.execute(registrationData);
       })
     ).subscribe({
       next: (registrationResponse) => {
-        console.log('REGISTRO COMPLETADO ID:', registrationResponse.id);
-        console.log('PROCESO FINALIZADO CON ÉXITO');
+        console.log('✅ REGISTRO COMPLETADO ID:', registrationResponse.id);
+        console.log('🎉 PROCESO FINALIZADO CON ÉXITO');
         
         alert('¡Registro creado exitosamente!');
         form.reset();
@@ -172,7 +179,7 @@ export class RegisterFormView implements AfterViewInit {
         }, 1000);
       },
       error: (error) => {
-        console.error('ERROR EN EL PROCESO');
+        console.error('❌ ERROR EN EL PROCESO');
         console.error('Error completo:', error);
         console.error('Status:', error.status);
         console.error('Mensaje:', error.message);

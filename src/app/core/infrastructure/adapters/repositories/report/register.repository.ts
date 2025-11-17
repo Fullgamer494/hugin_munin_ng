@@ -4,7 +4,7 @@ import {
   RegistroAltaResponse,
   EspecieRequest,
   EspecieResponse
-} from '../../../../features/animals/register-form.view/register.model';
+} from '../../../../../features/animals/register-form.view/register.model';
 
 export abstract class RegistrationRepository {
   abstract createEspecie(data: EspecieRequest): Observable<{ id: number }>;

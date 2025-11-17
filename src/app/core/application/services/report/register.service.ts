@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { RegistrationRepository } from '../../../../infrastructure/adapters/repositories/report/register.repository';
+import { RegistrationRepository } from '../../../../core/infrastructure/adapters/repositories/report/register.repository';
 import {
   CreateRegistroAltaUseCase,
   GetAllRegistrosAltaUseCase,

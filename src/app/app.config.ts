@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { authInterceptor } from './infrastructure/interceptors/auth.interceptor';
+import { authInterceptor } from './core/infrastructure/interceptors/auth.interceptor';
 
 import { ReportRepository } from './core/domain/ports/outbound/report/report.repository';
 import { SpecimenRepository } from './core/domain/ports/outbound/report/specimen.repository';
@@ -20,8 +20,8 @@ import {
   GetSpecimenByIdUseCase
 } from './core/domain/ports/inbound/report/specimen.use-case';
 
-import { ReportRepositoryImpl } from './infrastructure/adapters/repositories/report/report.repository.impl';
-import { SpecimenRepositoryImpl } from './infrastructure/adapters/repositories/report/specimen.repository.impl';
+import { ReportRepositoryImpl } from './core/infrastructure/adapters/repositories/report/report.repository.impl';
+import { SpecimenRepositoryImpl } from './core/infrastructure/adapters/repositories/report/specimen.repository.impl';
 import {
   GetAllReportsService,
   GetReportByIdService,
@@ -35,8 +35,8 @@ import {
   GetSpecimenByIdService
 } from './core/application/services/report/specimen.service';
 
-import { RegistrationRepository } from './infrastructure/adapters/repositories/report/register.repository';
-import { RegistrationRepositoryImpl } from './infrastructure/adapters/repositories/report/register.repository.impl';
+import { RegistrationRepository } from './core/infrastructure/adapters/repositories/report/register.repository';
+import { RegistrationRepositoryImpl } from './core/infrastructure/adapters/repositories/report/register.repository.impl';
 import {
   CreateRegistroAltaUseCase,
   GetAllRegistrosAltaUseCase,
