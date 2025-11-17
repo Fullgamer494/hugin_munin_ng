@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { RegistroAltaRequest, RegistroAltaResponse, EspecieRequest, EspecieResponse } from '../../../features/animals/register-form.view/register.model';
 
 export abstract class CreateRegistroAltaUseCase {
-  abstract execute(data: RegistroAltaRequest): Observable<RegistroAltaResponse>;
+  abstract execute(data: RegistroAltaRequest): Observable<{ id: number }>;  // ← Cambio aquí
 }
 
 export abstract class GetAllRegistrosAltaUseCase {

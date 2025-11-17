@@ -12,8 +12,8 @@ export const animalRoutes: Routes = [
             .then(m => m.RegisterFormView)
     },
     {
-        path: 'deregister_animal',
+        path: 'deregister/:id',  
         loadComponent: () => import('./deregister-form.view/deregister-form.view')
             .then(m => m.DeregisterFormView)
-    }
+}
 ];

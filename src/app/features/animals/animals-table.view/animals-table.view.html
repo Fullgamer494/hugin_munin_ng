@@ -69,15 +69,25 @@
                                 <mat-icon>more_vert</mat-icon>
                             </button>
                             <div class="actions-menu">
-                                <a [routerLink]="['/edit', animal.id]">
+                                <a [routerLink]="['/animals/edit', animal.id]">
                                     <mat-icon>edit</mat-icon>
                                     <span>Editar</span>
                                 </a>
-                                <button (click)="deleteAnimal(animal.id)">
+                                <a [routerLink]="['/animals/deregister', animal.id]">
                                     <mat-icon>delete</mat-icon>
-                                    <span>Eliminar</span>
-                                </button>
+                                    <span>Dar de baja</span>
+                                </a>
                             </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="animalesFiltrados.length === 0 && !isLoading">
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            No se encontraron animales
+                        </td>
+                    </tr>
+                    <tr *ngIf="isLoading">
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            Cargando...
                         </td>
                     </tr>
                 </tbody>

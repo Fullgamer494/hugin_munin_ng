@@ -157,7 +157,7 @@ export class AnimalsTableView implements OnInit {
       this.animalService.deleteAnimal(id).subscribe({
         next: () => {
           console.log('Animal eliminado con éxito');
-          this.loadAnimals(); // Recargar la lista
+          this.loadAnimals(); 
         },
         error: (err) => {
           console.error('Error al eliminar animal:', err);

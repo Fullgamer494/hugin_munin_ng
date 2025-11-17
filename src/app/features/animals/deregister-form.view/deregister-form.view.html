@@ -2,15 +2,25 @@
     <header class="main-header">
         <div class="page-name">
             <nav class="breadcrumb-nav">
-                <a routerLink="../" class="animals">Animales</a>
+                <a routerLink="/animals" class="animals">Animales</a>
                 <span><mat-icon>keyboard_arrow_right</mat-icon></span>
-                <a routerLink="./">Dar de baja ejemplar</a>
+                <a>Dar de baja ejemplar</a>
             </nav>
             <h1>Dar de baja ejemplar</h1>
         </div>
     </header>
+
+    <div *ngIf="isLoading" style="text-align: center; padding: 40px; font-family: 'Poppins';">
+        <p>Cargando información...</p>
+    </div>
+
+    <div *ngIf="error && !isLoading" style="text-align: center; padding: 40px; font-family: 'Poppins'; color: #c00;">
+        <mat-icon style="font-size: 48px;">error_outline</mat-icon>
+        <p>{{ error }}</p>
+        <a routerLink="/animals" style="color: #0066cc;">Volver a la lista</a>
+    </div>
     
-    <form id="deregisterSpecimen" class="form" (submit)="onSubmit($event)">
+    <form *ngIf="!isLoading && !error && specimenData" id="deregisterSpecimen" class="form" (submit)="onSubmit($event)">
         <section class="form-section">
             <header class="form-section-header">
                 <button 
@@ -69,6 +79,7 @@
                     <select 
                         id="causa_baja" 
                         name="causa_baja"
+                        required
                         (blur)="onFieldBlur($event)"
                         (change)="onFieldInput($event)">
                         <option value="1">Aprovechamiento</option>
@@ -103,7 +114,7 @@
                         id="observaciones_baja" 
                         name="observaciones_baja" 
                         rows="4" 
-                        placeholder="Describa características especiales del animal (color, marcas, comportamiento, etc.)"
+                        placeholder="Motivo detallado de la baja, condiciones del animal, destino, etc."
                         (blur)="onFieldBlur($event)"
                         (input)="onFieldInput($event)">
                     </textarea>
@@ -115,7 +126,7 @@
             <button type="submit" class="btn btn-submit" id="submitBtn">
                 Dar de baja
             </button>
-            <a routerLink="../" class="btn-reset">
+            <a routerLink="/animals" class="btn-reset">
                 Cancelar
             </a>
         </div>

@@ -1,11 +1,5 @@
 export interface RegistroAltaRequest {
-  idEspecimen?: number;
-  numInventario?: string;
-  idEspecie?: number;
-  nombreEspecimen?: string;
-  sexo?: string; 
-  fechaNacimiento?: string; 
-  
+  idEspecimen: number; 
   idOrigenAlta: number;
   idResponsable: number;
   fechaIngreso: string; 
