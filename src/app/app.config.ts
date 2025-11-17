@@ -35,6 +35,29 @@ import {
   GetSpecimenByIdService
 } from './core/application/services/report/specimen.service';
 
+import { RegistrationRepository } from './infrastructure/adapters/repositories/report/register.repository';
+import { RegistrationRepositoryImpl } from './infrastructure/adapters/repositories/report/register.repository.impl';
+import {
+  CreateRegistroAltaUseCase,
+  GetAllRegistrosAltaUseCase,
+  GetRegistroAltaByIdUseCase,
+  UpdateRegistroAltaUseCase,
+  DeleteRegistroAltaUseCase,
+  CreateEspecieUseCase,
+  GetAllEspeciesUseCase,
+  GetEspecieByIdUseCase
+} from './features/animals/register-form.view/register.case';
+import {
+  CreateRegistroAltaService,
+  GetAllRegistrosAltaService,
+  GetRegistroAltaByIdService,
+  UpdateRegistroAltaService,
+  DeleteRegistroAltaService,
+  CreateEspecieService,
+  GetAllEspeciesService,
+  GetEspecieByIdService
+} from './core/application/services/report/register.service';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -53,9 +76,19 @@ export const appConfig: ApplicationConfig = {
     { provide: DeleteReportUseCase, useClass: DeleteReportService },
     
     { provide: SearchSpecimensUseCase, useClass: SearchSpecimensService },
-    { provide: GetSpecimenByIdUseCase, useClass: GetSpecimenByIdService }
+    { provide: GetSpecimenByIdUseCase, useClass: GetSpecimenByIdService },
 
+  
+    { provide: RegistrationRepository, useClass: RegistrationRepositoryImpl },
     
+    { provide: CreateRegistroAltaUseCase, useClass: CreateRegistroAltaService },
+    { provide: GetAllRegistrosAltaUseCase, useClass: GetAllRegistrosAltaService },
+    { provide: GetRegistroAltaByIdUseCase, useClass: GetRegistroAltaByIdService },
+    { provide: UpdateRegistroAltaUseCase, useClass: UpdateRegistroAltaService },
+    { provide: DeleteRegistroAltaUseCase, useClass: DeleteRegistroAltaService },
+    
+    { provide: CreateEspecieUseCase, useClass: CreateEspecieService },
+    { provide: GetAllEspeciesUseCase, useClass: GetAllEspeciesService },
+    { provide: GetEspecieByIdUseCase, useClass: GetEspecieByIdService }
   ]
 };
-

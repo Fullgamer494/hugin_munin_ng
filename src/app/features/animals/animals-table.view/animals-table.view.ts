@@ -11,7 +11,7 @@ interface FullAnimalRecord {
   sexo: string;
   fechaNacimiento: string;
   activo: boolean;
-  id_especie: number;
+  idEspecie: number; 
   genero: string;
   especie: string;
   nombreComun: string | null;
@@ -64,6 +64,7 @@ export class AnimalsTableView implements OnInit {
         error: (err) => {
           console.error('Error al cargar animales:', err);
           console.error('Detalles del error:', err.message);
+          this.error = 'Error al cargar los animales. Por favor, intenta de nuevo.';
           this.isLoading = false;
         }
       });
@@ -106,7 +107,7 @@ export class AnimalsTableView implements OnInit {
         case 'especie':
           return a.especie.localeCompare(b.especie);
         case 'fecha':
-          return new Date(a.fechaNacimiento).getTime() - new Date(b.fechaNacimiento).getTime();
+          return new Date(a.fechaNacimiento || '').getTime() - new Date(b.fechaNacimiento || '').getTime();
         default:
           return 0;
       }
@@ -153,9 +154,16 @@ export class AnimalsTableView implements OnInit {
 
   deleteAnimal(id: number): void {
     if (confirm('¿Estás seguro de que deseas eliminar este animal?')) {
-   
-      console.log('Eliminando animal con id:', id);
-
+      this.animalService.deleteAnimal(id).subscribe({
+        next: () => {
+          console.log('Animal eliminado con éxito');
+          this.loadAnimals(); // Recargar la lista
+        },
+        error: (err) => {
+          console.error('Error al eliminar animal:', err);
+          alert('Error al eliminar el animal');
+        }
+      });
     }
   }
 

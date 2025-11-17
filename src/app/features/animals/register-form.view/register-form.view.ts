@@ -1,7 +1,11 @@
-import { Component, AfterViewInit, QueryList, ViewChildren, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, QueryList, ViewChildren, ElementRef, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { RouterLink } from "@angular/router";
+import { RouterLink, Router } from "@angular/router";
 import { CommonModule } from '@angular/common';
+import { CreateRegistroAltaUseCase } from '../../../features/animals/register-form.view/register.case';
+import { CreateEspecieUseCase } from '../../../features/animals/register-form.view/register.case';
+import { RegistroAltaRequest, EspecieRequest } from '../../../features/animals/register-form.view/register.model';
+
 
 @Component({
   selector: 'app-register-form.view',
@@ -13,6 +17,10 @@ import { CommonModule } from '@angular/common';
 export class RegisterFormView implements AfterViewInit {
   @ViewChildren('toggleBtn') toggleButtons!: QueryList<ElementRef>;
   @ViewChildren('sectionBody') sectionBodies!: QueryList<ElementRef>;
+
+  private createRegistroAltaUseCase = inject(CreateRegistroAltaUseCase);
+  private createEspecieUseCase = inject(CreateEspecieUseCase);
+  private router = inject(Router);
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -87,22 +95,71 @@ export class RegisterFormView implements AfterViewInit {
     
     const form = event.target as HTMLFormElement;
     const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+    const formData = new FormData(form);
 
     submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
 
-    setTimeout(() => {
-      submitBtn.disabled = false;
+    // 1. Primero crear la especie
+    const especieData: EspecieRequest = {
+      genero: formData.get('genero') as string,
+      especie: formData.get('especie') as string,
+      nombreComun: null
+    };
 
-      form.reset();
+    this.createEspecieUseCase.execute(especieData).subscribe({
+      next: (especieResponse) => {
+        console.log('Especie creada con ID:', especieResponse.id);
 
-      const requiredFields = form.querySelectorAll('[required]') as NodeListOf<HTMLInputElement>;
-      requiredFields.forEach(field => {
-        field.style.borderColor = '';
-      });
-    }, 1000);
+        const registroData: RegistroAltaRequest = {
+          numInventario: formData.get('NI_animal') as string,
+          idEspecie: especieResponse.id,
+          nombreEspecimen: formData.get('nombre_especimen') as string,
+          
+          
+          idOrigenAlta: parseInt(formData.get('id_origen') as string),
+          idResponsable: 1, 
+          fechaIngreso: formData.get('fecha_ingreso') as string,
+          procedencia: formData.get('procedencia') as string,
+          observacion: formData.get('observaciones_ingreso') as string
+        };
+
+        this.createRegistroAltaUseCase.execute(registroData).subscribe({
+          next: (response) => {
+            console.log('Registro de alta creado:', response);
+            
+          
+            alert('¡Registro creado exitosamente!');
+            
+           
+            form.reset();
+            
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Agregar';
+          },
+          error: (error) => {
+            console.error('Error al crear registro de alta:', error);
+            alert(`Error: ${error.error?.error || 'No se pudo crear el registro'}`);
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Agregar';
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error al crear especie:', error);
+        
+        
+        alert(`Error: ${error.error?.error || 'No se pudo crear la especie'}`);
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Agregar';
+      }
+    });
   }
 
-  onFieldBlur(event: Event): void {
+  onFieldBlur(event: any): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     
     if (field.hasAttribute('required')) {
@@ -114,7 +171,7 @@ export class RegisterFormView implements AfterViewInit {
     }
   }
 
-  onFieldInput(event: Event): void {
+  onFieldInput(event: any): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     
     if (field.hasAttribute('required') && field.value.trim() !== '') {

@@ -3,7 +3,8 @@ import { inject } from '@angular/core';
 import { CookieService } from '../adapters/storage/cookie.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const publicRoutes = ['/animals', '/login', '/register'];
+  
+  const publicRoutes = ['/api/', '/login', '/register'];
   
   const isPublicRoute = publicRoutes.some(route => req.url.includes(route));
   
