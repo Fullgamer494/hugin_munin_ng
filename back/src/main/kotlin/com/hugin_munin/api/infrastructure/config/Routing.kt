@@ -7,16 +7,17 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.hugin_munin.api.infrastructure.api.routes.especimenRouting
 import com.hugin_munin.api.infrastructure.api.routes.registroAltaRouting
+import com.hugin_munin.api.infrastructure.api.routes.registroBajaRouting
+import com.hugin_munin.api.infrastructure.api.routes.reporteRouting
+import com.hugin_munin.api.infrastructure.api.routes.reporteConductualRoutes
 import com.hugin_munin.api.application.services.EspecimenService
 import com.hugin_munin.api.application.services.EspecimenQueryService
 import com.hugin_munin.api.application.services.RegistroAltaService
 import com.hugin_munin.api.application.services.RegistroBajaService
+import com.hugin_munin.api.application.services.ReporteService
 import com.hugin_munin.api.domain.ports.EspecimenRepository
-import com.hugin_munin.api.infrastructure.api.routes.registroBajaRouting
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
-import com.hugin_munin.api.infrastructure.api.routes.reporteRouting // Importar
-import com.hugin_munin.api.application.services.ReporteService // Importar
 
 @Serializable
 data class ErrorResponse(val error: String, val message: String)
@@ -46,6 +47,8 @@ fun Application.configureRouting() {
             especimenRouting(especimenService, especimenQueryService, registroAltaService, especimenRepository)
             registroAltaRouting(registroAltaService)
             registroBajaRouting(registroBajaService)
-            reporteRouting(reporteService) // Endpoint de reportes
-        }    }
+            reporteRouting(reporteService)
+            reporteConductualRoutes()
+        }
+    }
 }
