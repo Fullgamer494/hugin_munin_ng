@@ -3,6 +3,7 @@ package com.hugin_munin.api.infrastructure.database.schemas
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.date
 import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.sql.kotlin.datetime.date
 
 object RegistroBajaTable : Table("registro_baja") {
     val id = integer("id_registro_baja").autoIncrement()

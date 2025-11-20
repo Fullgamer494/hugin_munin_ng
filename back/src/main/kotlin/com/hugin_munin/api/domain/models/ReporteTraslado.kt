@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReporteTraslado(
-    val reporteId: Int, // FK a Reporte
+    val reporteId: Int,
     val areaOrigen: String,
     val areaDestino: String,
     val ubicacionOrigen: String,
