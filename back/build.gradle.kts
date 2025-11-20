@@ -16,13 +16,17 @@ repositories {
 }
 
 dependencies {
-    // Ktor
+    // Ktor Core
     implementation("io.ktor:ktor-server-core-jvm:3.0.3")
     implementation("io.ktor:ktor-server-netty-jvm:3.0.3")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:3.0.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:3.0.3")
     implementation("io.ktor:ktor-server-status-pages-jvm:3.0.3")
     implementation("io.ktor:ktor-server-config-yaml:3.0.3")
+
+    // JWT
+    implementation("io.ktor:ktor-server-auth-jvm:3.0.3")
+    implementation("io.ktor:ktor-server-auth-jwt-jvm:3.0.3")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.4.14")
@@ -37,12 +41,15 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.1")
     implementation("com.zaxxer:HikariCP:5.1.0")
 
-    // Koin para Ktor 3.x
+    // Koin
     implementation("io.insert-koin:koin-ktor:4.0.0")
     implementation("io.insert-koin:koin-logger-slf4j:4.0.0")
 
     // Kotlinx DateTime
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+
+    // Bycript para hash de contras
+    implementation("org.mindrot:jbcrypt:0.4")
 
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:3.0.3")

@@ -5,26 +5,19 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.hugin_munin.api.infrastructure.api.routes.especimenRouting
-import com.hugin_munin.api.infrastructure.api.routes.registroAltaRouting
-import com.hugin_munin.api.application.services.EspecimenService
-import com.hugin_munin.api.application.services.EspecimenQueryService
-import com.hugin_munin.api.application.services.RegistroAltaService
-import com.hugin_munin.api.application.services.RegistroBajaService
+import io.ktor.server.auth.*  // ⬅️ NUEVO
+import com.hugin_munin.api.infrastructure.api.routes.*
+import com.hugin_munin.api.application.services.*
 import com.hugin_munin.api.domain.ports.EspecimenRepository
-import com.hugin_munin.api.infrastructure.api.routes.registroBajaRouting
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
-import com.hugin_munin.api.infrastructure.api.routes.reporteRouting
-import com.hugin_munin.api.application.services.ReporteService
-import com.hugin_munin.api.infrastructure.api.routes.trasladoRouting
-import com.hugin_munin.api.application.services.TrasladoService
-
 
 @Serializable
 data class ErrorResponse(val error: String, val message: String)
 
 fun Application.configureRouting() {
+    // Inyectar servicios
+    val authService by inject<AuthService>()  // ⬅️ NUEVO
     val especimenService by inject<EspecimenService>()
     val especimenQueryService by inject<EspecimenQueryService>()
     val registroAltaService by inject<RegistroAltaService>()
@@ -46,12 +39,18 @@ fun Application.configureRouting() {
         get("/") { call.respondText("Hello World!") }
         get("/health") { call.respond(mapOf("status" to "OK")) }
 
-        route("/hm") {
-            especimenRouting(especimenService, especimenQueryService, registroAltaService, especimenRepository)
-            registroAltaRouting(registroAltaService)
-            registroBajaRouting(registroBajaService)
-            reporteRouting(reporteService)
-            trasladoRouting(trasladoService)
+        // Rutas no protegidas (autenticación)
+        authRouting(authService)
+
+        // Rutas protegidas con JWT
+        authenticate("auth-jwt") {
+            route("/hm") {
+                especimenRouting(especimenService, especimenQueryService, registroAltaService, especimenRepository)
+                registroAltaRouting(registroAltaService)
+                registroBajaRouting(registroBajaService)
+                reporteRouting(reporteService)
+                trasladoRouting(trasladoService)
+            }
         }
     }
 }

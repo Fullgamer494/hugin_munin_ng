@@ -11,7 +11,7 @@ object DatabaseFactory {
             driverClassName = "org.postgresql.Driver"
             jdbcUrl = "jdbc:postgresql://localhost:5432/hugin_munin"
             username = "postgres"
-            password = "aurora28"
+            password = "qwerty123"
             maximumPoolSize = 3
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"

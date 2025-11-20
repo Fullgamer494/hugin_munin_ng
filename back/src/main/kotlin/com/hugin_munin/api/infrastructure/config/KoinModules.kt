@@ -2,12 +2,7 @@ package com.hugin_munin.api.infrastructure.config
 
 import com.hugin_munin.api.domain.ports.*
 import com.hugin_munin.api.infrastructure.database.repositories.*
-import com.hugin_munin.api.application.services.EspecimenService
-import com.hugin_munin.api.application.services.EspecimenQueryService
-import com.hugin_munin.api.application.services.RegistroAltaService
-import com.hugin_munin.api.application.services.RegistroBajaService
-import com.hugin_munin.api.application.services.ReporteService
-import com.hugin_munin.api.application.services.TrasladoService
+import com.hugin_munin.api.application.services.*
 
 import org.koin.dsl.module
 
@@ -18,6 +13,9 @@ val appModule = module {
     single<ReporteRepository> { ReporteRepositoryImpl() }
     single<CausaBajaRepository> { CausaBajaRepositoryImpl() }
     single<RegistroBajaRepository> { RegistroBajaRepositoryImpl() }
+
+
+    single<AuthRepository> { AuthRepositoryImpl() }
 
     single {
         EspecimenService(
@@ -66,4 +64,9 @@ val appModule = module {
         )
     }
 
+    single {
+        AuthService(
+            authRepository = get()
+        )
+    }
 }
