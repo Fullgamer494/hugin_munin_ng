@@ -1,0 +1,115 @@
+<div class="container">
+  <div class="form-card">
+    <h2>Registrar Alta</h2>
+
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="specimenId">Espécimen *</label>
+        <select 
+          id="specimenId" 
+          formControlName="specimenId"
+          [class.invalid]="isFieldInvalid('specimenId')">
+          <option value="">Seleccione un espécimen</option>
+          <option *ngFor="let specimen of specimens" [value]="specimen.id">
+            {{ specimen.inventoryNumber }} - {{ specimen.specimenName }}
+          </option>
+        </select>
+        <span class="error-message" *ngIf="isFieldInvalid('specimenId')">
+          {{ getErrorMessage('specimenId') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="originId">Origen del Alta *</label>
+        <select 
+          id="originId" 
+          formControlName="originId"
+          [class.invalid]="isFieldInvalid('originId')">
+          <option value="">Seleccione un origen</option>
+          <option *ngFor="let origin of origins" [value]="origin.id">
+            {{ origin.originName }}
+          </option>
+        </select>
+        <span class="error-message" *ngIf="isFieldInvalid('originId')">
+          {{ getErrorMessage('originId') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="registrationDate">Fecha de Alta *</label>
+        <input 
+          type="date" 
+          id="registrationDate" 
+          formControlName="registrationDate"
+          [class.invalid]="isFieldInvalid('registrationDate')">
+        <span class="error-message" *ngIf="isFieldInvalid('registrationDate')">
+          {{ getErrorMessage('registrationDate') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="guideNumber">Número de Guía</label>
+        <input 
+          type="text" 
+          id="guideNumber" 
+          formControlName="guideNumber"
+          placeholder="Ingrese el número de guía">
+      </div>
+
+      <div class="form-group">
+        <label for="origin">Procedencia</label>
+        <input 
+          type="text" 
+          id="origin" 
+          formControlName="origin"
+          placeholder="Ingrese la procedencia"
+          [class.invalid]="isFieldInvalid('origin')">
+        <span class="error-message" *ngIf="isFieldInvalid('origin')">
+          {{ getErrorMessage('origin') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="arrivalCondition">Condición de Llegada</label>
+        <textarea 
+          id="arrivalCondition" 
+          formControlName="arrivalCondition"
+          rows="3"
+          placeholder="Describa la condición de llegada del espécimen"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="observations">Observaciones</label>
+        <textarea 
+          id="observations" 
+          formControlName="observations"
+          rows="4"
+          placeholder="Observaciones adicionales"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="onCancel()"
+          [disabled]="loading">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="loading">
+          {{ loading ? 'Guardando...' : 'Guardar Alta' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
