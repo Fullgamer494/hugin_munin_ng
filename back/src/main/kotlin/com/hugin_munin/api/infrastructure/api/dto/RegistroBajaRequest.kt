@@ -30,18 +30,6 @@ data class RegistroBajaResponse(
 )
 
 @Serializable
-data class RegistroBajaDetalleResponse(
-    val id: Int,
-    val especimenId: Int,
-    val especimenNombre: String,
-    val numInventario: String,
-    val causaBajaNombre: String,
-    val responsableId: Int,
-    val fechaBaja: LocalDate,
-    val observacion: String?
-)
-
-@Serializable
 data class CausaBajaResponse(
     val id: Int,
     val nombreCausaBaja: String

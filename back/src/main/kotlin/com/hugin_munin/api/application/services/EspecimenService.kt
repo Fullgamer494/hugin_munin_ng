@@ -66,6 +66,7 @@ class EspecimenService(
             genero = especie.genero,
             especieNombre = especie.especie,
             activo = especimen.activo,
+            origenAltaId = origenAlta.id,
             registroAlta = RegistroAltaInfo(
                 id = registroAlta.id!!,
                 origenAltaNombre = origenAlta.nombre,

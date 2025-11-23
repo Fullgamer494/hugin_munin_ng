@@ -11,6 +11,7 @@ data class EspecimenDetalleResponse(
     val genero: String,
     val especieNombre: String,
     val activo: Boolean,
+    val origenAltaId: Int,
     val registroAlta: RegistroAltaInfo
 )
 

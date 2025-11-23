@@ -13,8 +13,8 @@ fun Route.registroBajaRouting(registroBajaService: RegistroBajaService) {
 
         get {
             val registros = registroBajaService.getAllRegistros()
-            val responses = registros.map { it.toResponse() }
-            call.respond(HttpStatusCode.OK, responses)
+            // Ya no necesitas transformar con toResponse() porque registros ya es List<RegistroBajaDetalleResponse>
+            call.respond(HttpStatusCode.OK, registros)
         }
 
         get("/{id}") {
@@ -23,7 +23,7 @@ fun Route.registroBajaRouting(registroBajaService: RegistroBajaService) {
 
             val registro = registroBajaService.getRegistroById(id)
             if (registro != null) {
-                call.respond(HttpStatusCode.OK, registro.toResponse())
+                call.respond(HttpStatusCode.OK, registro)
             } else {
                 call.respond(HttpStatusCode.NotFound, "Registro de baja no encontrado")
             }
@@ -35,7 +35,7 @@ fun Route.registroBajaRouting(registroBajaService: RegistroBajaService) {
 
             val registro = registroBajaService.getRegistroByEspecimenId(especimenId)
             if (registro != null) {
-                call.respond(HttpStatusCode.OK, registro.toResponse())
+                call.respond(HttpStatusCode.OK, registro)
             } else {
                 call.respond(HttpStatusCode.NotFound, "Registro de baja no encontrado para el especimen")
             }
@@ -66,18 +66,10 @@ fun Route.registroBajaRouting(registroBajaService: RegistroBajaService) {
 
             val request = call.receive<RegistroBajaUpdateRequest>()
 
-            val bajaData = RegistroBaja(
-                especimenId = 0,
-                causaBajaId = request.causaBajaId,
-                responsableId = 0,
-                fechaBaja = request.fechaBaja,
-                observacion = request.observacion
-            )
-
             try {
-                val updated = registroBajaService.updateRegistroBaja(id, bajaData)
+                val updated = registroBajaService.updateRegistroBaja(id, request)
                 if (updated != null) {
-                    call.respond(HttpStatusCode.OK, updated.toResponse())
+                    call.respond(HttpStatusCode.OK, updated)
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Registro de baja no encontrado")
                 }

@@ -2,6 +2,8 @@ package com.hugin_munin.api.application.services
 
 import com.hugin_munin.api.domain.models.RegistroBaja
 import com.hugin_munin.api.domain.ports.*
+import com.hugin_munin.api.infrastructure.api.dto.RegistroBajaDetalleResponse
+import com.hugin_munin.api.infrastructure.api.dto.RegistroBajaUpdateRequest
 
 class RegistroBajaService(
     private val registroBajaRepository: RegistroBajaRepository,
@@ -9,15 +11,15 @@ class RegistroBajaService(
     private val causaBajaRepository: CausaBajaRepository
 ) {
 
-    suspend fun getAllRegistros(): List<RegistroBaja> {
+    suspend fun getAllRegistros(): List<RegistroBajaDetalleResponse> {
         return registroBajaRepository.findAll()
     }
 
-    suspend fun getRegistroById(id: Int): RegistroBaja? {
+    suspend fun getRegistroById(id: Int): RegistroBajaDetalleResponse? {
         return registroBajaRepository.findById(id)
     }
 
-    suspend fun getRegistroByEspecimenId(especimenId: Int): RegistroBaja? {
+    suspend fun getRegistroByEspecimenId(especimenId: Int): RegistroBajaDetalleResponse? {
         return registroBajaRepository.findByEspecimenId(especimenId)
     }
 
@@ -43,21 +45,6 @@ class RegistroBajaService(
         return registroBajaRepository.save(baja)
     }
 
-    suspend fun updateRegistroBaja(id: Int, baja: RegistroBaja): RegistroBaja? {
-        val existing = registroBajaRepository.findById(id) ?: return null
-
-        val causaBaja = causaBajaRepository.findById(baja.causaBajaId)
-            ?: throw IllegalArgumentException("Causa de baja con ID ${baja.causaBajaId} no encontrada")
-
-        val updated = existing.copy(
-            causaBajaId = baja.causaBajaId,
-            fechaBaja = baja.fechaBaja,
-            observacion = baja.observacion
-        )
-
-        return registroBajaRepository.update(id, updated)
-    }
-
     suspend fun deleteRegistroBaja(id: Int): Boolean {
         val baja = registroBajaRepository.findById(id) ?: return false
 
@@ -72,5 +59,24 @@ class RegistroBajaService(
 
     suspend fun getAllCausasBaja(): List<com.hugin_munin.api.domain.models.CausaBaja> {
         return causaBajaRepository.findAll()
+    }
+
+    suspend fun updateRegistroBaja(id: Int, updateRequest: RegistroBajaUpdateRequest): RegistroBajaDetalleResponse? {
+        val existingBaja = registroBajaRepository.findById(id) ?: return null
+
+        val causaBaja = causaBajaRepository.findById(updateRequest.causaBajaId)
+            ?: throw IllegalArgumentException("Causa de baja con ID ${updateRequest.causaBajaId} no encontrada")
+
+        // Creamos un RegistroBaja para la actualización manteniendo los campos que no se modifican
+        val registroBajaToUpdate = RegistroBaja(
+            id = id,
+            especimenId = existingBaja.especimenId,
+            causaBajaId = updateRequest.causaBajaId,
+            responsableId = existingBaja.responsable.id, // Aquí está el responsableId que faltaba
+            fechaBaja = updateRequest.fechaBaja,
+            observacion = updateRequest.observacion
+        )
+
+        return registroBajaRepository.update(id, registroBajaToUpdate)
     }
 }
