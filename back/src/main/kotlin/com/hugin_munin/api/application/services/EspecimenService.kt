@@ -2,6 +2,7 @@ package com.hugin_munin.api.application.services
 
 import com.hugin_munin.api.domain.models.*
 import com.hugin_munin.api.domain.ports.*
+import kotlinx.datetime.LocalDate
 
 class EspecimenService(
     private val especieRepository: EspecieRepository,
@@ -28,6 +29,7 @@ class EspecimenService(
             especimenId = nuevoEspecimen.id,
             responsableId = altaData.responsableId,
             asunto = "Ingreso inicial: ${nuevoEspecimen.nombre}",
+            fechaReporte = altaData.fechaIngreso,
             contenido = "Espécimen ingresado y ubicado en ${trasladoData.ubicacionDestino}"
         )
         val nuevoReportePadre = reporteRepository.save(reportePadre)

@@ -10,8 +10,11 @@ import com.hugin_munin.api.infrastructure.api.dto.TrasladoUpdateRequest
 import com.hugin_munin.api.infrastructure.api.dto.TrasladoResponse
 import com.hugin_munin.api.infrastructure.api.dto.TrasladoDetalleResponse
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 
 class TrasladoService(
     private val reporteRepository: ReporteRepository,

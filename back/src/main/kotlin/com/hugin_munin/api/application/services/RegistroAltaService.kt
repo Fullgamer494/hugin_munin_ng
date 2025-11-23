@@ -35,6 +35,7 @@ class RegistroAltaService(
             especimenId = especimen.id,
             responsableId = altaData.responsableId,
             asunto = "Registro de alta: ${especimen.nombre}",
+            fechaReporte = altaData.fechaIngreso,
             contenido = "Espécimen registrado y ubicado en ${trasladoData.ubicacionDestino}"
         )
         val nuevoReportePadre = reporteRepository.save(reportePadre)
