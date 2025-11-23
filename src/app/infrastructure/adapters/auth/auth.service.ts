@@ -59,12 +59,15 @@ export class AuthService {
   }
 
   // Función auxiliar para leer el ID oculto en el Token JWT
-  private getUserIdFromToken(token: string): number | null {
+private getUserIdFromToken(token: string): number | null {
     try {
+      if (!token || token.split('.').length < 2) return null; // Validación extra
+      
       const payload = token.split('.')[1];
       const decoded = JSON.parse(atob(payload));
       return decoded.id || null;
     } catch (e) {
+      console.warn('Error al decodificar el token:', e);
       return null;
     }
   }
