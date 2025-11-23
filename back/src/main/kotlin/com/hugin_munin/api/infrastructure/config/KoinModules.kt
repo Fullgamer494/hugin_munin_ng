@@ -14,7 +14,6 @@ val appModule = module {
     single<CausaBajaRepository> { CausaBajaRepositoryImpl() }
     single<RegistroBajaRepository> { RegistroBajaRepositoryImpl() }
 
-
     single<AuthRepository> { AuthRepositoryImpl() }
 
     single {
@@ -22,16 +21,8 @@ val appModule = module {
             especieRepository = get(),
             especimenRepository = get(),
             altaRepository = get(),
-            reporteRepository = get()
-        )
-    }
-
-    single {
-        EspecimenQueryService(
-            especimenRepository = get(),
-            especieRepository = get(),
-            registroAltaRepository = get(),
-            reporteRepository = get()
+            reporteRepository = get(),
+            registroAltaRepository = get()
         )
     }
 

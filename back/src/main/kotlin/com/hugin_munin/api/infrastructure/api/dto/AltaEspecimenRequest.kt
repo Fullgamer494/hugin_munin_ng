@@ -27,3 +27,24 @@ data class AltaEspecimenRequest(
     val ubicacionOrigen: String,
     val ubicacionDestino: String
 )
+
+@Serializable
+data class UpdateAltaEspecimenRequest(
+    // Datos del espécimen
+    val nombreEspecimen: String,
+
+    // Datos de la especie (opcional si quieres permitir cambiarla)
+    val genero: String?,
+    val especieNombre: String?,
+
+    // Datos del registro de alta
+    val fechaIngreso: LocalDate,
+    val origenAltaId: Int,
+    val procedencia: String?,
+    val observacion: String?,
+
+    // Datos del traslado (excluyendo lo que NO debe cambiar)
+    // areaOrigen, areaDestino, ubicacionOrigen NO se actualizan
+    val ubicacionDestino: String?,
+    val motivo: String?
+)

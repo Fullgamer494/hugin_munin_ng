@@ -101,4 +101,11 @@ class ReporteRepositoryImpl : ReporteRepository {
             }
             .singleOrNull()
     }
+
+    override suspend fun updateTraslado(reporteId: Int, traslado: ReporteTraslado): Boolean = dbQuery {
+        ReporteTrasladoTable.update({ ReporteTrasladoTable.reporteId eq reporteId }) {
+            it[ubicacionDestino] = traslado.ubicacionDestino
+            it[motivo] = traslado.motivo
+        } > 0
+    }
 }

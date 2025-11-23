@@ -1,6 +1,7 @@
 package com.hugin_munin.api.domain.ports
 
 import com.hugin_munin.api.domain.models.AuthenticatedUser
+import com.hugin_munin.api.domain.models.RefreshTokenInfo
 
 interface AuthRepository {
     suspend fun findUserByEmail(email: String): AuthenticatedUser?
@@ -10,11 +11,3 @@ interface AuthRepository {
     suspend fun revokeRefreshToken(token: String): Boolean
     suspend fun revokeAllUserTokens(userId: Int): Boolean
 }
-
-data class RefreshTokenInfo(
-    val id: Int,
-    val userId: Int,
-    val token: String,
-    val expiresAt: Long,
-    val revoked: Boolean
-)

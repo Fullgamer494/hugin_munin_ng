@@ -14,8 +14,5 @@ enum class Area(val valor: String) {
         fun valoresPermitidos(): List<String> {
             return entries.map { it.valor }
         }
-        fun esValido(valor: String): Boolean {
-            return fromString(valor) != null
-        }
     }
 }

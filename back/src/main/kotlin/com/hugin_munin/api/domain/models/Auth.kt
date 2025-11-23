@@ -37,3 +37,11 @@ data class AuthenticatedUser(
     val permisos: List<String>,
     val activo: Boolean
 )
+
+data class RefreshTokenInfo(
+    val id: Int,
+    val userId: Int,
+    val token: String,
+    val expiresAt: Long,
+    val revoked: Boolean
+)

@@ -1,12 +1,9 @@
 package com.hugin_munin.api.infrastructure.api.routes
 
 import com.hugin_munin.api.application.services.EspecimenService
-import com.hugin_munin.api.application.services.EspecimenQueryService
-import com.hugin_munin.api.application.services.RegistroAltaService
 import com.hugin_munin.api.domain.models.*
-import com.hugin_munin.api.domain.ports.EspecimenRepository
 import com.hugin_munin.api.infrastructure.api.dto.AltaEspecimenRequest
-import com.hugin_munin.api.infrastructure.api.dto.EspecimenUpdateRequest
+import com.hugin_munin.api.infrastructure.api.dto.UpdateAltaEspecimenRequest
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -14,9 +11,6 @@ import io.ktor.server.routing.*
 
 fun Route.especimenRouting(
     especimenService: EspecimenService,
-    especimenQueryService: EspecimenQueryService,
-    registroAltaService: RegistroAltaService,
-    especimenRepository: EspecimenRepository
 ) {
     route("/especimen") {
 
@@ -24,7 +18,7 @@ fun Route.especimenRouting(
             val id = call.parameters["id"]?.toIntOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "El ID de espécimen no es válido.")
 
-            val detalle = especimenQueryService.getEspecimenDetalleById(id)
+            val detalle = especimenService.getEspecimenDetalleById(id)
             if (detalle != null) {
                 call.respond(HttpStatusCode.OK, detalle)
             } else {
@@ -33,7 +27,7 @@ fun Route.especimenRouting(
         }
 
         get {
-            val detalles = especimenQueryService.getAllEspecimenesDetalle()
+            val detalles = especimenService.getAllEspecimenesDetalle()
             call.respond(HttpStatusCode.OK, detalles)
         }
 
@@ -81,33 +75,17 @@ fun Route.especimenRouting(
 
         put("/{id}") {
             val id = call.parameters["id"]?.toIntOrNull()
-                ?: return@put call.respond(HttpStatusCode.BadRequest, "El ID de espécimen no es válido.")
+                ?: return@put call.respond(HttpStatusCode.BadRequest, "ID inválido")
 
-            val request = call.receive<EspecimenUpdateRequest>()
+            val request = call.receive<UpdateAltaEspecimenRequest>()
 
-            val especimenExistente = especimenRepository.findById(id)
-                ?: return@put call.respond(HttpStatusCode.NotFound, "Espécimen no encontrado.")
+            val detalleActualizado = especimenService.update(id, request)
 
-            val registroAlta = registroAltaService.getRegistroByEspecimenId(id)
-                ?: return@put call.respond(HttpStatusCode.NotFound, "Registro de alta no encontrado.")
-
-            val especimenActualizado = especimenExistente.copy(
-                nombre = request.nombreEspecimen
-            )
-
-            especimenRepository.update(id, especimenActualizado)
-
-            val altaActualizada = registroAlta.copy(
-                origenAltaId = request.origenAltaId,
-                fechaIngreso = request.fechaIngreso,
-                procedencia = request.procedencia,
-                observacion = request.observacion
-            )
-
-            registroAltaService.updateRegistroAlta(registroAlta.id!!, altaActualizada)
-
-            val detalleActualizado = especimenQueryService.getEspecimenDetalleById(id)
-            call.respond(HttpStatusCode.OK, detalleActualizado!!)
+            if (detalleActualizado != null) {
+                call.respond(HttpStatusCode.OK, detalleActualizado)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Espécimen no encontrado")
+            }
         }
     }
 }
