@@ -108,13 +108,11 @@ class EspecimenService(
                 Especie(genero = request.genero, especie = request.especieNombre)
             )
 
-            // Actualizar especimen con nueva especie
             especimenRepository.update(id, especimen.copy(
                 nombre = request.nombreEspecimen,
                 especieId = especieFinal.id!!
             ))
         } else {
-            // Solo actualizar nombre
             especimenRepository.update(id, especimen.copy(
                 nombre = request.nombreEspecimen
             ))
@@ -128,6 +126,21 @@ class EspecimenService(
             observacion = request.observacion
         ))
 
-        return null // Retornar el detalle actualizado
+        // 3. Actualizar ReporteTraslado (solo campos permitidos)
+        if (request.ubicacionDestino != null || request.motivo != null) {
+            val trasladoActual = reporteRepository.findTrasladoByReporteId(
+                registroAlta.idReporteTraslado
+            )
+
+            if (trasladoActual != null) {
+                val trasladoActualizado = trasladoActual.copy(
+                    ubicacionDestino = request.ubicacionDestino ?: trasladoActual.ubicacionDestino,
+                    motivo = request.motivo ?: trasladoActual.motivo
+                )
+                reporteRepository.updateTraslado(registroAlta.idReporteTraslado, trasladoActualizado)
+            }
+        }
+
+        return getEspecimenDetalleById(id)
     }
 }

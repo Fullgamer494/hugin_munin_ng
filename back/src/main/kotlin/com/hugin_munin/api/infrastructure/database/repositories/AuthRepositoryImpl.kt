@@ -2,7 +2,7 @@ package com.hugin_munin.api.infrastructure.database.repositories
 
 import com.hugin_munin.api.domain.models.AuthenticatedUser
 import com.hugin_munin.api.domain.ports.AuthRepository
-import com.hugin_munin.api.domain.ports.RefreshTokenInfo
+import com.hugin_munin.api.domain.models.RefreshTokenInfo
 import com.hugin_munin.api.infrastructure.database.DatabaseFactory.dbQuery
 import com.hugin_munin.api.infrastructure.database.schemas.*
 import kotlinx.datetime.Instant
