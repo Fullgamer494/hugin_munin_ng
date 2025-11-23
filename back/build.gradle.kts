@@ -54,4 +54,7 @@ dependencies {
     // Testing
     testImplementation("io.ktor:ktor-server-test-host-jvm:3.0.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.0.21")
+
+    // CORS
+    implementation("io.ktor:ktor-server-cors-jvm:3.0.3")
 }
