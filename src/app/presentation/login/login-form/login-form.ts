@@ -11,22 +11,19 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login-form.html',
   styleUrls: ['./login-form.css']
 })
-// IMPORTANTE: El nombre de la clase debe ser LoginFormComponent
 export class LoginFormComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Variables para el HTML (Soluciona errores de template)
   passwordFieldType: string = 'password';
   errorMessage: string = '';
   
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.email]], 
     password: ['', [Validators.required]]
   });
 
-  // Método para el botón de "ver contraseña"
   togglePasswordVisibility(event: Event) {
     event.preventDefault();
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
@@ -34,10 +31,15 @@ export class LoginFormComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
+      // Adaptamos el objeto para enviarlo al servicio como 'email'
+      const loginData = {
+        email: this.loginForm.value.username, // Mapeamos username 
+        password: this.loginForm.value.password
+      };
+
+      this.authService.login(loginData).subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
-        },
+          this.router.navigate(['/app/dashboard']);        },
         error: (err) => {
           console.error(err);
           this.errorMessage = 'Correo o contraseña incorrectos.';

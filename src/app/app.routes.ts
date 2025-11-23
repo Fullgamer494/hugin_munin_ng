@@ -2,38 +2,42 @@ import { Routes } from '@angular/router';
 import { authGuard } from './infrastructure/guards/auth.guard';
 
 export const routes: Routes = [
-    // 1. RUTA PÚBLICA: Login
+    // =======================================================
+    // 1. ZONA PÚBLICA (Landing y Login) - Sin Guard
+    // =======================================================
     {
-        path: 'login',
+        path: '',
         loadComponent: () => import('./layouts/public.layout/public.layout')
             .then(m => m.PublicLayout),
         children: [
             {
-                path: '',
+                path: '', // Al entrar a localhost:4200 -> Muestra LANDING
+                loadComponent: () => import('./presentation/landing/landing-page/landing-page')
+                    .then(m => m.LandingPageComponent)
+            },
+            {
+                path: 'login', // Al entrar a localhost:4200/login -> Muestra LOGIN
                 loadComponent: () => import('./presentation/login/login-page/login-page')
                     .then(m => m.LoginPageComponent)
             }
         ]
     },
 
-    // 2. RUTAS PRIVADAS: Todo lo demás
-    // Protegidas por 'authGuard'. Si no hay token, redirige al login.
+    // =======================================================
+    // 2. ZONA PRIVADA (Dashboard, Animales, etc.) - Con Guard
+    // =======================================================
     {
-        path: '',
-        canActivate: [authGuard], 
+        path: 'app', // Prefijo para todo lo privado
+        canActivate: [authGuard], // ¡Aquí está la seguridad!
         loadComponent: () => import('./layouts/private.layout/private.layout')
             .then(m => m.PrivateLayout),
         children: [
-            {
-                path: '',
-                redirectTo: 'dashboard',
-                pathMatch: 'full'
-            },
             {
                 path: 'dashboard',
                 loadComponent: () => import('./features/dashboard/dashboard.view/dashboard.view')
                     .then(m => m.DashboardView)
             },
+            // Tus otras rutas...
             {
                 path: 'animals',
                 loadChildren: () => import('./features/animals/animals.routes')
@@ -48,13 +52,19 @@ export const routes: Routes = [
                 path: 'reports',
                 loadChildren: () => import('./features/reports/reports.routes')
                     .then(m => m.reportRoutes)
+            },
+            // Redirección interna: si entran a /app, van al dashboard
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
             }
         ]
     },
 
-    // 3. WILDCARD: Cualquier ruta desconocida redirige al dashboard (o login si no hay token)
+    // 3. WILDCARD: Cualquier ruta desconocida -> Landing Page
     {
         path: '**',
-        redirectTo: 'dashboard'
+        redirectTo: '' 
     }
 ];

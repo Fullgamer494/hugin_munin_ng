@@ -41,10 +41,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     
-    // IMPORTANTE: Aquí registramos el interceptor de autenticación
     provideHttpClient(withInterceptors([authInterceptor])),
     
-    // Tus proveedores existentes
     { provide: ReportRepository, useClass: ReportRepositoryImpl },
     { provide: SpecimenRepository, useClass: SpecimenRepositoryImpl },
     

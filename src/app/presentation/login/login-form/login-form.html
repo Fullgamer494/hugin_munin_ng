@@ -9,5 +9,15 @@
         <i class="ti ti-eye toggle-password" id="togglePassword" (click)="togglePasswordVisibility($event)"></i>
     </div>
 
-    <button type="submit" [disabled]="!loginForm.valid">Iniciar sesión</button>
+    <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        @if (errorMessage) {
+        <div class="error-alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ errorMessage }}</span>
+        </div>
+        }
+
+        <button type="submit" [disabled]="!loginForm.valid">Iniciar sesión</button>
+    </form>
+
 </form>
