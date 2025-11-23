@@ -33,12 +33,3 @@ data class TrasladoInfo(
     val ubicacionOrigen: String,
     val motivo: String?
 )
-
-@Serializable
-data class EspecimenSimpleResponse(
-    val id: Int,
-    val numInventario: String,
-    val nombre: String,
-    val especieId: Int,
-    val activo: Boolean
-)

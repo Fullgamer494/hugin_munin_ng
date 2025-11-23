@@ -65,7 +65,7 @@ fun Route.especimenRouting(
                 reporteId = 0,
                 areaOrigen = "Externo",
                 areaDestino = request.areaDestino,
-                ubicacionOrigen = request.procedencia ?: "Desconocida",
+                ubicacionOrigen = request.ubicacionOrigen,
                 ubicacionDestino = request.ubicacionDestino,
                 motivo = "Ingreso inicial al centro"
             )

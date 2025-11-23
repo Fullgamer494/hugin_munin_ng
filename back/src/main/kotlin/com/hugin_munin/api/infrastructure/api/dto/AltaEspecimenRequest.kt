@@ -24,5 +24,6 @@ data class AltaEspecimenRequest(
 
     // Datos del traslado inicial
     val areaDestino: String,
+    val ubicacionOrigen: String,
     val ubicacionDestino: String
 )
