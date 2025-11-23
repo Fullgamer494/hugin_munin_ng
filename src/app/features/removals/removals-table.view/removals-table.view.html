@@ -1,0 +1,78 @@
+<div class="main-content">
+    <header class="main-header">
+        <div class="page-name">
+            <nav class="breadcrumb-nav">
+                <a routerLink="animals">Animales</a>
+            </nav>
+            <h1>Mamíferos dados de baja</h1>
+        </div>
+    </header>
+    <section class="controls">
+        <div class="search-container">
+            <label for="searchInput">
+                <mat-icon>search</mat-icon>
+            </label>
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar...">
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="sortSelect">Ordenar por</label>
+                <select class="filter-select" id="sortSelect">
+                    <option value="identificador">Identificador</option>
+                    <option value="genero">Género</option>
+                    <option value="especie">Especie</option>
+                    <option value="fechaIngreso">Fecha de ingreso</option>
+                    <option value="fechaBaja">Fecha de baja</option>
+                </select>
+            </div>
+        </div>
+    </section>
+    <section class="main-body">
+        <div class="table-container">
+            <table class="table" id="mammalsTable">
+                <thead>
+                    <tr>
+                        <th>Identificador</th>
+                        <th>Género</th>
+                        <th>Especie</th>
+                        <th>Origen</th>
+                        <th>Procedencia</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Fecha de baja</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="mammalsTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <div class="pagination-info">
+                <span id="paginationInfo">1-10 de 350 items</span>
+                <select class="pagination-filter-select" id="itemsPerPage">
+                    <option value="10">10 por página</option>
+                    <option value="25">25 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                </select>
+            </div>
+            
+            <div class="pagination-controls">
+                <button class="page-btn" id="prevBtn" disabled>
+                    <mat-icon>keyboard_arrow_left</mat-icon>
+                </button>
+                <button class="page-btn active" data-page="1">1</button>
+                <button class="page-btn" data-page="2">2</button>
+                <button class="page-btn" data-page="3">3</button>
+                <button class="page-btn" data-page="4">4</button>
+                <button class="page-btn" data-page="5">5</button>
+                <span>...</span>
+                <button class="page-btn" data-page="16">16</button>
+                <button class="page-btn" id="nextBtn">
+                    <mat-icon>keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+        </div>
+    </section>
+</div>

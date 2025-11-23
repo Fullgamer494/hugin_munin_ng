@@ -1,3 +1,26 @@
+:root{
+    --aside: #84BC0D;
+    --bg: #FBFBFB;
+    --header: #0C0F0A;
+    --stroke: #818181;
+    --green-font: #659400;
+    --nav-option-selected: #436300;
+    --green-btns: #A7D14D;
+
+    --night: #0C0F0A;
+    --main-green: #84BC0D;
+    --white: #FFFFFF;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
 :root {
     --night: #0C0F0A;
     --bg: #FBFBFB;

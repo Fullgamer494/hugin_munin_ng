@@ -1,41 +1,50 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
 import { CommonModule } from '@angular/common';
-// 1. Importar ReactiveFormsModule y todo lo necesario para formularios
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
-  // 2. Añadir ReactiveFormsModule a los imports
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login-form.html',
-  styleUrl: './login-form.css'
+  styleUrls: ['./login-form.css']
 })
+// IMPORTANTE: El nombre de la clase debe ser LoginFormComponent
 export class LoginFormComponent {
-  // Variable para controlar el tipo de input (password o text)
-  passwordFieldType = 'password';
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  // 3. Definir el formulario reactivo
-  loginForm = new FormGroup({
-    username: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+  // Variables para el HTML (Soluciona errores de template)
+  passwordFieldType: string = 'password';
+  errorMessage: string = '';
+  
+  loginForm: FormGroup = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]]
   });
 
-  // 4. Función que se llama al enviar el formulario
-  onSubmit() {
-    if (this.loginForm.valid) {
-      console.log('Formulario enviado:', this.loginForm.value);
-      // Aquí es donde se llamaria al servicio de autenticación
-    }
+  // Método para el botón de "ver contraseña"
+  togglePasswordVisibility(event: Event) {
+    event.preventDefault();
+    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }
 
-  // 5. Lógica para el botón de mostrar/ocultar contraseña
-  togglePasswordVisibility(event: Event) {
-    event.preventDefault(); // Prevenir que el clic envíe el formulario
-    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
-    
-    const icon = event.target as HTMLElement;
-    icon.classList.toggle('ti-eye');
-    icon.classList.toggle('ti-eye-off');
+  onSubmit() {
+    if (this.loginForm.valid) {
+      this.authService.login(this.loginForm.value).subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error(err);
+          this.errorMessage = 'Correo o contraseña incorrectos.';
+        }
+      });
+    } else {
+        this.loginForm.markAllAsTouched();
+    }
   }
 }
