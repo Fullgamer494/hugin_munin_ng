@@ -1,23 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
+import { EspecimenService } from '../../../api/application/especimen.service';
+import { EspecimenDetalleResponse } from '../../../api/domain/models/especimen-alta.model';
 
-interface DeregistrationRecord {
+// Interfaz local para los datos combinados de la tabla
+interface AnimalBajaTabla extends EspecimenDetalleResponse {
+  fechaBaja: string | null;
+  causaBajaId: number | null;
+}
+
+// Interfaz para la respuesta del endpoint de bajas
+interface RegistroBajaResponse {
   id: number;
-  specimenId: number;
-  specimenName: string;
-  inventoryNumber: string;
-  genus: string;
-  species: string;
-  commonName: string | null;
-  causeName: string;
-  registeredByName: string;
-  deregistrationDate: string;
-  destination: string | null;
-  observations: string | null;
+  especimenId: number;
+  causaBajaId: number;
+  responsableId: number;
+  fechaBaja: string;
+  observacion: string | null;
 }
 
 @Component({
@@ -28,50 +33,74 @@ interface DeregistrationRecord {
   styleUrl: './removals-table.view.css',
 })
 export class RemovalsTableView implements OnInit {
-  animalesDadosDeBaja: DeregistrationRecord[] = [];
-  animalesFiltrados: DeregistrationRecord[] = [];
-  isLoading: boolean = false;
-  error: string = '';
+  // Inyecciones
+  private http = inject(HttpClient);
+  private especimenService = inject(EspecimenService);
+  private apiUrl = environment.apiUrl;
 
+  // Estado
+  animalesDeBaja: AnimalBajaTabla[] = [];
+  animalesFiltrados: AnimalBajaTabla[] = [];
+  isLoading: boolean = true;
+  error: string = '';
+  menuAbiertoId: number | null = null;
+
+  // Paginación
   currentPage: number = 0;
   itemsPerPage: number = 10;
   totalItems: number = 0;
   totalPages: number = 0;
 
+  // Filtros
   searchTerm: string = '';
-  sortBy: string = 'identificador';
-
-  private apiUrl = environment.apiUrl;
-
-  constructor(private http: HttpClient) {}
+  sortBy: string = 'fechaBaja';
 
   ngOnInit(): void {
-    this.loadDeregisteredAnimals();
+    this.loadData();
   }
 
-  loadDeregisteredAnimals(): void {
+loadData(): void {
     this.isLoading = true;
-    this.error = '';
-    
-    console.log('Cargando animales dados de baja...');
-    
-    this.http.get<DeregistrationRecord[]>(`${this.apiUrl}/api/deregistrations`)
-      .subscribe({
-        next: (data) => {
-          console.log('Datos de bajas recibidos:', data);
-          this.animalesDadosDeBaja = data;
-          this.animalesFiltrados = data;
-          this.totalItems = data.length;
-          this.calculateTotalPages();
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar animales dados de baja:', err);
-          this.error = 'Error al cargar los animales dados de baja. Por favor, intenta de nuevo.';
-          this.isLoading = false;
-        }
-      });
+
+    forkJoin({
+      todosLosAnimales: this.especimenService.getAllSpecimens(),
+      registrosBaja: this.http.get<RegistroBajaResponse[]>(`${this.apiUrl}/hm/registro-baja`)
+    }).pipe(
+      map(results => {
+        // Filtramos solo los animales inactivos (bajas)
+        const inactivos = results.todosLosAnimales.filter(a => !a.activo);
+
+        // Cruzamos la información
+        return inactivos.map(animal => {
+          const bajaInfo = results.registrosBaja.find(b => b.especimenId === animal.id);
+          
+          return {
+            ...animal,
+            fechaBaja: bajaInfo ? bajaInfo.fechaBaja : null,
+            causaBajaId: bajaInfo ? bajaInfo.causaBajaId : null
+          } as AnimalBajaTabla;
+        });
+      })
+    ).subscribe({
+      next: (dataCombinada) => {
+        console.log('Datos de bajas cargados:', dataCombinada); // Log para verificar
+        this.animalesDeBaja = dataCombinada;
+        this.filterAnimals(); 
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando datos de bajas:', err);
+        this.error = 'No se pudo cargar la lista de bajas.';
+        this.isLoading = false;
+      }
+    });
   }
+
+  toggleMenu(id: number): void {
+    this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
+  }
+
+  // --- Lógica de Filtrado y Ordenamiento ---
 
   onSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -87,38 +116,40 @@ export class RemovalsTableView implements OnInit {
 
   filterAnimals(): void {
     if (!this.searchTerm) {
-      this.animalesFiltrados = [...this.animalesDadosDeBaja];
+      this.animalesFiltrados = [...this.animalesDeBaja];
     } else {
-      this.animalesFiltrados = this.animalesDadosDeBaja.filter(animal =>
-        animal.inventoryNumber.toLowerCase().includes(this.searchTerm) ||
-        animal.specimenName.toLowerCase().includes(this.searchTerm) ||
-        animal.genus.toLowerCase().includes(this.searchTerm) ||
-        animal.species.toLowerCase().includes(this.searchTerm) ||
-        animal.causeName.toLowerCase().includes(this.searchTerm) ||
-        (animal.commonName && animal.commonName.toLowerCase().includes(this.searchTerm))
+      this.animalesFiltrados = this.animalesDeBaja.filter(animal =>
+        animal.numInventario.toLowerCase().includes(this.searchTerm) ||
+        animal.especieNombre.toLowerCase().includes(this.searchTerm) ||
+        animal.genero.toLowerCase().includes(this.searchTerm)
       );
     }
+    this.sortAnimals();
     this.calculateTotalPages();
     this.currentPage = 0;
-    this.sortAnimals();
   }
 
   sortAnimals(): void {
     this.animalesFiltrados.sort((a, b) => {
       switch (this.sortBy) {
         case 'identificador':
-          return a.inventoryNumber.localeCompare(b.inventoryNumber);
+          return a.numInventario.localeCompare(b.numInventario);
         case 'genero':
-          return a.genus.localeCompare(b.genus);
+          return a.genero.localeCompare(b.genero);
         case 'especie':
-          return a.species.localeCompare(b.species);
+          return a.especieNombre.localeCompare(b.especieNombre);
         case 'fechaBaja':
-          return new Date(b.deregistrationDate).getTime() - new Date(a.deregistrationDate).getTime();
+          // Orden descendente por defecto para fechas (más reciente primero)
+          const dateA = a.fechaBaja ? new Date(a.fechaBaja).getTime() : 0;
+          const dateB = b.fechaBaja ? new Date(b.fechaBaja).getTime() : 0;
+          return dateB - dateA;
         default:
           return 0;
       }
     });
   }
+
+  // --- Lógica de Paginación ---
 
   onItemsPerPageChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
@@ -127,91 +158,49 @@ export class RemovalsTableView implements OnInit {
     this.calculateTotalPages();
   }
 
-  goToPage(page: number): void {
-    if (page >= 0 && page < this.totalPages) {
-      this.currentPage = page;
-    }
+  calculateTotalPages(): void {
+    this.totalItems = this.animalesFiltrados.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage) || 1;
   }
 
-  nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-    }
+  getPaginatedAnimals(): AnimalBajaTabla[] {
+    const start = this.currentPage * this.itemsPerPage;
+    return this.animalesFiltrados.slice(start, start + this.itemsPerPage);
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
   }
 
   previousPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    }
+    if (this.currentPage > 0) this.currentPage--;
   }
 
-  calculateTotalPages(): void {
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    if (this.totalPages === 0) this.totalPages = 1;
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) this.currentPage++;
   }
 
   getPaginationInfo(): string {
-    if (this.totalItems === 0) return '0-0 de 0 items';
-    const start = this.currentPage * this.itemsPerPage + 1;
+    if (this.totalItems === 0) return '0 - 0 de 0';
+    const start = (this.currentPage * this.itemsPerPage) + 1;
     const end = Math.min((this.currentPage + 1) * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} de ${this.totalItems} items`;
-  }
-
-  getPaginatedAnimals(): DeregistrationRecord[] {
-    const start = this.currentPage * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.animalesFiltrados.slice(start, end);
+    return `${start} - ${end} de ${this.totalItems}`;
   }
 
   getVisiblePages(): number[] {
-    const pages: number[] = [];
-    const maxVisible = 5;
+    // Lógica simplificada para mostrar páginas
+    const pages = [];
+    const maxPages = 5;
+    let startPage = Math.max(0, this.currentPage - 2);
+    let endPage = Math.min(this.totalPages, startPage + maxPages);
     
-    if (this.totalPages <= maxVisible) {
-      for (let i = 0; i < this.totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      let start = Math.max(0, this.currentPage - Math.floor(maxVisible / 2));
-      let end = Math.min(this.totalPages, start + maxVisible);
-      
-      if (end - start < maxVisible) {
-        start = Math.max(0, end - maxVisible);
-      }
-      
-      for (let i = start; i < end; i++) {
-        pages.push(i);
-      }
+    if (endPage - startPage < maxPages) {
+      startPage = Math.max(0, endPage - maxPages);
     }
-    
+
+    for (let i = startPage; i < endPage; i++) {
+      pages.push(i);
+    }
     return pages;
-  }
-
-  toggleMenu(event: Event): void {
-    const button = event.currentTarget as HTMLButtonElement;
-    const menu = button.nextElementSibling as HTMLElement;
-    
-    document.querySelectorAll('.actions-menu.show').forEach(m => {
-      if (m !== menu) m.classList.remove('show');
-    });
-    
-    menu.classList.toggle('show');
-    
-    const closeMenu = (e: MouseEvent) => {
-      if (!button.contains(e.target as Node) && !menu.contains(e.target as Node)) {
-        menu.classList.remove('show');
-        document.removeEventListener('click', closeMenu);
-      }
-    };
-    
-    setTimeout(() => document.addEventListener('click', closeMenu), 0);
-  }
-
-  viewDetails(specimenId: number): void {
-    console.log('Ver detalles del especimen:', specimenId);
-  }
-
-  viewReport(deregistrationId: number): void {
-    console.log('Ver reporte de baja:', deregistrationId);
   }
 }
