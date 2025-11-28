@@ -83,7 +83,7 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   loadSpecimenData(): void {
     console.log('Cargando datos del animal ID:', this.specimenId);
 
-    this.http.get<SpecimenData>(`${this.apiUrl}/api/specimens/${this.specimenId}`)
+    this.http.get<SpecimenData>(`${this.apiUrl}/hm/especimen/${this.specimenId}`)
       .subscribe({
         next: (data) => {
           console.log('Datos del animal cargados:', data);
@@ -173,7 +173,7 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     }
   }
 
-  onSubmit(event: Event): void {
+onSubmit(event: Event): void {
   event.preventDefault();
   
   if (!this.specimenData) {
@@ -185,32 +185,29 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
   const formData = new FormData(form);
 
+  // Validación básica
   const fechaBaja = formData.get('fecha_baja') as string;
   if (!fechaBaja) {
     alert('Por favor selecciona la fecha de baja');
     return;
   }
 
+  // Obtenemos los valores del formulario
   const causaBaja = parseInt(formData.get('causa_baja') as string);
   const observaciones = formData.get('observaciones_baja') as string;
 
+  // Confirmación visual
   const causasNombres = [
-    '',
-    'Aprovechamiento',
-    'Cambio de depositaría',
-    'Fuga',
-    'Deceso',
-    'Préstamo',
-    'Liberación',
-    'Entrega a PROFEPA'
+    '', // índice 0 vacío
+    'Aprovechamiento', 'Cambio de depositaría', 'Fuga', 'Deceso',
+    'Préstamo', 'Liberación', 'Entrega a PROFEPA'
   ];
 
   const confirmed = confirm(
     `¿Confirmas dar de baja el siguiente animal?\n\n` +
     `Identificador: ${this.specimenData.inventoryNumber}\n` +
     `Nombre: ${this.specimenData.specimenName}\n` +
-    `Especie: ${this.specimenData.genus} ${this.specimenData.species}\n\n` +
-    `Causa: ${causasNombres[causaBaja]}\n` +
+    `Causa: ${causasNombres[causaBaja] || 'Desconocida'}\n` +
     `Fecha: ${fechaBaja}\n\n` +
     'Esta acción marcará al animal como inactivo y creará un registro de baja.'
   );
@@ -220,55 +217,44 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Procesando...';
 
-  // ✅ CAMPOS CORREGIDOS para coincidir con el backend
-  const deregistrationData: DeregistrationRequest = {
-    specimenId: this.specimenId,        // ✅ CORREGIDO
-    causeId: causaBaja,                 // ✅ CORREGIDO
-    registeredBy: 1,                    // ✅ CORREGIDO
-    deregistrationDate: fechaBaja,      // ✅ CORREGIDO
-    observations: observaciones || undefined // ✅ CORREGIDO
+  // 1. Estructura exacta que espera el Backend (RegistroBajaRequest.kt)
+  const bajaRequest = {
+    especimenId: this.specimenId,
+    causaBajaId: causaBaja,
+    responsableId: 1, // ID hardcodeado temporalmente (debería venir del AuthService)
+    fechaBaja: fechaBaja, // Formato YYYY-MM-DD
+    observacion: observaciones || null
   };
 
-  console.log('Enviando registro de baja:', deregistrationData);
+  console.log('Enviando registro de baja:', bajaRequest);
 
-  this.http.post<{ id: number }>(
-    `${this.apiUrl}/api/deregistrations`,
-    deregistrationData
+  // 2. URL Correcta: /hm/registro-baja
+  this.http.post<any>(
+    `${this.apiUrl}/hm/registro-baja`, 
+    bajaRequest
   ).subscribe({
     next: (response) => {
-      console.log('Registro de baja creado con ID:', response.id);
-      
-      alert(
-        `Animal dado de baja exitosamente\n\n` +
-        `Identificador: ${this.specimenData!.inventoryNumber}\n` +
-        `Causa: ${causasNombres[causaBaja]}\n` +
-        `Registro de baja ID: ${response.id}`
-      );
-
-      this.router.navigate(['/animals']);
+      console.log('✅ Registro de baja creado con éxito:', response);
+      alert('Animal dado de baja exitosamente.');
+      this.router.navigate(['/app/animals']); // Regresar a la lista
     },
     error: (err) => {
-      console.error('Error al crear registro de baja:', err);
-      console.error('Detalles:', err.error);
-      
+      console.error('❌ Error al dar de baja:', err);
       let errorMessage = 'No se pudo dar de baja el animal';
       
-      if (err.error?.error) {
-        errorMessage = err.error.error;
+      // Intentar extraer mensaje del error del backend
+      if (err.error && typeof err.error === 'string') {
+          errorMessage = err.error;
       } else if (err.error?.message) {
-        errorMessage = err.error.message;
-      } else if (err.message) {
-        errorMessage = err.message;
+          errorMessage = err.error.message;
       }
       
       alert(`Error: ${errorMessage}`);
-      
       submitBtn.disabled = false;
       submitBtn.textContent = 'Dar de baja';
     }
   });
 }
-
   onFieldBlur(event: Event): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     

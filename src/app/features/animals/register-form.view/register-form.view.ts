@@ -64,39 +64,60 @@ export class RegisterFormView implements OnInit, AfterViewInit {
 
   // --- Lógica del Formulario y Conexión al Backend ---
 
-  onSubmit(): void {
-    if (this.specimenForm.invalid) {
-      this.specimenForm.markAllAsTouched(); 
-      console.error('Formulario inválido. Revise los campos requeridos.');
-      return;
-    }
+// En register-form.view.ts
 
-    this.isSaving = true;
-    
-    // 1. Obtener todos los valores, incluyendo el campo deshabilitado 'areaOrigen'
-    const rawValue = this.specimenForm.getRawValue(); 
-    
-    // 2. Castear la fecha string del input (YYYY-MM-DD) a objeto Date para el Adaptador
-    const altaRequest: AltaEspecimenRequest = {
-        ...rawValue,
-        // Convertir la cadena de fecha del formulario a un objeto Date
-        fechaIngreso: new Date(rawValue.fechaIngreso) 
-    };
-
-    // 3. Llama al Caso de Uso y se suscribe
-    this.especimenService.saveSpecimen(altaRequest).subscribe({
-      next: (response) => {
-        this.isSaving = false;
-        this.router.navigate(['../']); 
-      },
-      error: (err) => {
-        console.error('Error al guardar:', err);
-        this.isSaving = false;
-        // Aquí puedes mostrar una notificación de error al usuario
-      }
-    });
+onSubmit(): void {
+  if (this.specimenForm.invalid) {
+    this.specimenForm.markAllAsTouched();
+    // Opcional: mostrar un mensaje visual de error tipo Toast/Snackbar aquí
+    return;
   }
-  
+
+  this.isSaving = true;
+  const rawValue = this.specimenForm.getRawValue();
+
+  // Mapeo explícito para asegurar tipos de datos correctos hacia el Backend
+  const altaRequest: AltaEspecimenRequest = {
+      genero: rawValue.genero,
+      especieNombre: rawValue.especieNombre,
+      numInventario: rawValue.numInventario,
+      nombreEspecimen: rawValue.nombreEspecimen,
+      
+      // IMPORTANTE: Responsable hardcodeado a 1 por ahora (Gilberto en tus seeds)
+      // Idealmente esto vendría de tu AuthService.getCurrentUserId()
+      responsableId: 1, 
+
+      // Conversión de fecha string a objeto Date para que el Adapter lo procese
+      fechaIngreso: new Date(rawValue.fechaIngreso),
+
+      // IMPORTANTE: Conversión a Número. El HTML devuelve string "1", el Backend espera Int 1.
+      origenAltaId: Number(rawValue.origenAltaId),
+      
+      procedencia: rawValue.procedencia,
+      observacionAlta: rawValue.observacionAlta,
+
+      // Datos de ubicación
+      areaDestino: rawValue.areaDestino,
+      ubicacionOrigen: rawValue.ubicacionOrigen,
+      ubicacionDestino: rawValue.ubicacionDestino
+      
+      // Nota: No enviamos 'areaOrigen' porque tu Backend (EspecimenRoutes.kt) 
+      // lo define automáticamente como "Externo".
+  };
+
+  this.especimenService.saveSpecimen(altaRequest).subscribe({
+    next: (response) => {
+      console.log('✅ Especimen registrado con éxito:', response);
+      this.isSaving = false;
+      this.router.navigate(['/app/animals']); // Redirige a la tabla
+    },
+    error: (err) => {
+      console.error('❌ Error al guardar:', err);
+      this.isSaving = false;
+      alert('Error al registrar el animal. Revisa la consola para más detalles.');
+    }
+  });
+}  
   // --- Lógica de Interacción Visual Recuperada ---
   
   // Lógica de apertura de la primera sección al cargar la vista

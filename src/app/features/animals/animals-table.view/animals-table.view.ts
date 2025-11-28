@@ -61,7 +61,9 @@ export class AnimalsTableView implements OnInit { // Implementamos OnInit
             this.isLoading = false;
         }
 
-        const filtered = this.applyFilter(animales, searchTerm);
+        const animalesActivos = animales.filter(animal => animal.activo);
+
+        const filtered = this.applyFilter(animalesActivos, searchTerm);
         const sorted = this.applySort(filtered, sort.field, sort.direction);
 
         // Actualiza las variables síncronas de paginación
