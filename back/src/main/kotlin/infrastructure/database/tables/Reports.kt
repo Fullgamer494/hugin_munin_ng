@@ -23,6 +23,7 @@ object Reports : IntIdTable("reporte", "id_reporte") {
     val attachedFile = varchar("archivo_adjunto", 255).nullable()
     val createdAt = timestamp("fecha_creacion").defaultExpression(CurrentTimestamp)
     val updatedAt = timestamp("fecha_actualizacion").defaultExpression(CurrentTimestamp)
+    val asunto = varchar("asunto", 255)
 }
 
 object ClinicalReports : IntIdTable("reporte_clinico", "id_reporte_clinico") {
