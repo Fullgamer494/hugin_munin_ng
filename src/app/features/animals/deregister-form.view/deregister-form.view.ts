@@ -193,7 +193,7 @@ onSubmit(event: Event): void {
   }
 
   // Obtenemos los valores del formulario
-  const causaBaja = parseInt(formData.get('causa_baja') as string);
+  const causaBaja = Number(formData.get('causa_baja'));
   const observaciones = formData.get('observaciones_baja') as string;
 
   // Confirmación visual
