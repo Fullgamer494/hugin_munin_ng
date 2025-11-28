@@ -1,4 +1,4 @@
-package com.hugin_munin.http.routes
+package com.hugin_munin.infrastructure.http.routes
 
 import com.hugin_munin.infrastructure.services.*
 import io.ktor.http.*
