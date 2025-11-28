@@ -9,13 +9,13 @@ import { environment } from '../../../../environments/environment';
 import { EspecimenService } from '../../../api/application/especimen.service';
 import { EspecimenDetalleResponse } from '../../../api/domain/models/especimen-alta.model';
 
-// Interfaz local para los datos combinados de la tabla
+// Interfaz combinada para la tabla
 interface AnimalBajaTabla extends EspecimenDetalleResponse {
   fechaBaja: string | null;
   causaBajaId: number | null;
 }
 
-// Interfaz para la respuesta del endpoint de bajas
+// Interfaz de respuesta del Backend
 interface RegistroBajaResponse {
   id: number;
   especimenId: number;
@@ -33,44 +33,41 @@ interface RegistroBajaResponse {
   styleUrl: './removals-table.view.css',
 })
 export class RemovalsTableView implements OnInit {
-  // Inyecciones
   private http = inject(HttpClient);
   private especimenService = inject(EspecimenService);
   private apiUrl = environment.apiUrl;
 
-  // Estado
   animalesDeBaja: AnimalBajaTabla[] = [];
   animalesFiltrados: AnimalBajaTabla[] = [];
   isLoading: boolean = true;
   error: string = '';
-  menuAbiertoId: number | null = null;
-
+  
   // Paginación
   currentPage: number = 0;
   itemsPerPage: number = 10;
   totalItems: number = 0;
   totalPages: number = 0;
 
-  // Filtros
   searchTerm: string = '';
-  sortBy: string = 'fechaBaja';
+  menuAbiertoId: number | null = null;
 
   ngOnInit(): void {
     this.loadData();
   }
 
-loadData(): void {
+  loadData(): void {
     this.isLoading = true;
 
+    // PETICIÓN PARALELA (JOIN): Traemos Especímenes y Registros de Baja
     forkJoin({
       todosLosAnimales: this.especimenService.getAllSpecimens(),
-      registrosBaja: this.http.get<RegistroBajaResponse[]>(`${this.apiUrl}/hm/registro-baja`)
+      registrosBaja: this.http.get<RegistroBajaResponse[]>(`${this.apiUrl}/hm/registro-baja`) // URL CORRECTA
     }).pipe(
       map(results => {
-        // Filtramos solo los animales inactivos (bajas)
+        // 1. Nos quedamos solo con los inactivos
         const inactivos = results.todosLosAnimales.filter(a => !a.activo);
 
-        // Cruzamos la información
+        // 2. Combinamos con la fecha de baja
         return inactivos.map(animal => {
           const bajaInfo = results.registrosBaja.find(b => b.especimenId === animal.id);
           
@@ -82,36 +79,26 @@ loadData(): void {
         });
       })
     ).subscribe({
-      next: (dataCombinada) => {
-        console.log('Datos de bajas cargados:', dataCombinada); // Log para verificar
-        this.animalesDeBaja = dataCombinada;
-        this.filterAnimals(); 
+      next: (data) => {
+        console.log('✅ Bajas cargadas:', data);
+        this.animalesDeBaja = data;
+        this.filterAnimals();
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error cargando datos de bajas:', err);
-        this.error = 'No se pudo cargar la lista de bajas.';
+        console.error('❌ Error cargando bajas:', err);
+        this.error = 'Error al conectar con el servidor.';
         this.isLoading = false;
       }
     });
   }
 
-  toggleMenu(id: number): void {
-    this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
-  }
-
-  // --- Lógica de Filtrado y Ordenamiento ---
+  // --- Filtros y Lógica Visual ---
 
   onSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.searchTerm = input.value.toLowerCase();
     this.filterAnimals();
-  }
-
-  onSortChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.sortBy = select.value;
-    this.sortAnimals();
   }
 
   filterAnimals(): void {
@@ -124,36 +111,18 @@ loadData(): void {
         animal.genero.toLowerCase().includes(this.searchTerm)
       );
     }
-    this.sortAnimals();
     this.calculateTotalPages();
     this.currentPage = 0;
   }
 
-  sortAnimals(): void {
-    this.animalesFiltrados.sort((a, b) => {
-      switch (this.sortBy) {
-        case 'identificador':
-          return a.numInventario.localeCompare(b.numInventario);
-        case 'genero':
-          return a.genero.localeCompare(b.genero);
-        case 'especie':
-          return a.especieNombre.localeCompare(b.especieNombre);
-        case 'fechaBaja':
-          // Orden descendente por defecto para fechas (más reciente primero)
-          const dateA = a.fechaBaja ? new Date(a.fechaBaja).getTime() : 0;
-          const dateB = b.fechaBaja ? new Date(b.fechaBaja).getTime() : 0;
-          return dateB - dateA;
-        default:
-          return 0;
-      }
-    });
+  toggleMenu(id: number): void {
+    this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
   }
 
-  // --- Lógica de Paginación ---
+  // --- Paginación ---
 
   onItemsPerPageChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.itemsPerPage = Number(select.value);
+    this.itemsPerPage = Number((event.target as HTMLSelectElement).value);
     this.currentPage = 0;
     this.calculateTotalPages();
   }
@@ -168,17 +137,9 @@ loadData(): void {
     return this.animalesFiltrados.slice(start, start + this.itemsPerPage);
   }
 
-  goToPage(page: number): void {
-    this.currentPage = page;
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 0) this.currentPage--;
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) this.currentPage++;
-  }
+  previousPage(): void { if (this.currentPage > 0) this.currentPage--; }
+  nextPage(): void { if (this.currentPage < this.totalPages - 1) this.currentPage++; }
+  goToPage(page: number): void { this.currentPage = page; }
 
   getPaginationInfo(): string {
     if (this.totalItems === 0) return '0 - 0 de 0';
@@ -188,19 +149,7 @@ loadData(): void {
   }
 
   getVisiblePages(): number[] {
-    // Lógica simplificada para mostrar páginas
-    const pages = [];
-    const maxPages = 5;
-    let startPage = Math.max(0, this.currentPage - 2);
-    let endPage = Math.min(this.totalPages, startPage + maxPages);
-    
-    if (endPage - startPage < maxPages) {
-      startPage = Math.max(0, endPage - maxPages);
-    }
-
-    for (let i = startPage; i < endPage; i++) {
-      pages.push(i);
-    }
-    return pages;
+    // Retorna array simple para iterar páginas (ej: [0, 1, 2])
+    return Array.from({length: this.totalPages}, (_, i) => i);
   }
 }
