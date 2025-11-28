@@ -1,6 +1,7 @@
 package com.hugin_munin
 
 import com.hugin_munin.infrastructure.database.DatabaseFactory
+import com.hugin_munin.infrastructure.database.tables.configureDatabases
 import com.hugin_munin.infrastructure.plugins.*
 import io.ktor.server.application.*
 
