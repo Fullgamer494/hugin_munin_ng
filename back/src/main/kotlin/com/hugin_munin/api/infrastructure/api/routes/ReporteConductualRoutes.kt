@@ -31,7 +31,8 @@ fun Route.reporteConductualRoutes() {
             } catch (e: IllegalArgumentException) {
                 call.respond(HttpStatusCode.BadRequest, MessageResponse(e.message ?: "Error de validación"))
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, MessageResponse("Error al crear reporte"))
+                e.printStackTrace()
+                call.respond(HttpStatusCode.InternalServerError, MessageResponse("Error al crear reporte: ${e.message}"))
             }
         }
 
