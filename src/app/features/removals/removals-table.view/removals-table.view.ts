@@ -1,24 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-
-interface DeregistrationRecord {
-  id: number;
-  specimenId: number;
-  specimenName: string;
-  inventoryNumber: string;
-  genus: string;
-  species: string;
-  commonName: string | null;
-  causeName: string;
-  registeredByName: string;
-  deregistrationDate: string;
-  destination: string | null;
-  observations: string | null;
-}
+import { BehaviorSubject, Observable, combineLatest, map, startWith } from 'rxjs';
+import { EspecimenService } from '../../../api/application/especimen.service';
+import { RegistroBajaDetalleResponse } from '../../../api/domain/models/especimen-baja.model';
 
 @Component({
   selector: 'app-removals-table',
@@ -28,190 +14,192 @@ interface DeregistrationRecord {
   styleUrl: './removals-table.view.css',
 })
 export class RemovalsTableView implements OnInit {
-  animalesDadosDeBaja: DeregistrationRecord[] = [];
-  animalesFiltrados: DeregistrationRecord[] = [];
+
+  // Inyección de dependencias
+  private especimenService = inject(EspecimenService);
+  private router = inject(Router);
+
+  // --- Streams de control (BehaviorSubject) ---
+  searchSubject = new BehaviorSubject<string>('');
+  sortSubject = new BehaviorSubject<{ field: string, direction: string }>({ field: 'identificador', direction: 'asc' });
+  pageIndexSubject = new BehaviorSubject<number>(0);
+  pageSizeSubject = new BehaviorSubject<number>(10);
+
+  // --- Propiedades de la Vista ---
+  animalesFiltrados$!: Observable<RegistroBajaDetalleResponse[]>;
+
+  // Variables síncronas para la paginación y estado
+  currentPage: number = 0;
+  totalPages: number = 0;
+  totalItems: number = 0;
   isLoading: boolean = false;
   error: string = '';
-
-  currentPage: number = 0;
-  itemsPerPage: number = 10;
-  totalItems: number = 0;
-  totalPages: number = 0;
-
-  searchTerm: string = '';
-  sortBy: string = 'identificador';
-
-  private apiUrl = environment.apiUrl;
-
-  constructor(private http: HttpClient) {}
+  menuAbiertoId: number | null = null;
 
   ngOnInit(): void {
-    this.loadDeregisteredAnimals();
-  }
-
-  loadDeregisteredAnimals(): void {
     this.isLoading = true;
     this.error = '';
-    
-    console.log('Cargando animales dados de baja...');
-    
-    this.http.get<DeregistrationRecord[]>(`${this.apiUrl}/api/deregistrations`)
-      .subscribe({
-        next: (data) => {
-          console.log('Datos de bajas recibidos:', data);
-          this.animalesDadosDeBaja = data;
-          this.animalesFiltrados = data;
-          this.totalItems = data.length;
-          this.calculateTotalPages();
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar animales dados de baja:', err);
-          this.error = 'Error al cargar los animales dados de baja. Por favor, intenta de nuevo.';
+
+    const allRemovals$ = this.especimenService.getAllRegistrosBaja().pipe(
+      startWith([] as RegistroBajaDetalleResponse[])
+    );
+
+    this.animalesFiltrados$ = combineLatest([
+      allRemovals$,
+      this.searchSubject,
+      this.sortSubject,
+      this.pageIndexSubject,
+      this.pageSizeSubject
+    ]).pipe(
+      map(([animales, searchTerm, sort, pageIndex, pageSize]) => {
+
+        if (this.isLoading && animales.length > 0) {
           this.isLoading = false;
         }
-      });
-  }
 
-  onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchTerm = input.value.toLowerCase();
-    this.filterAnimals();
-  }
+        const filtered = this.applyFilter(animales, searchTerm);
+        const sorted = this.applySort(filtered, sort.field, sort.direction);
 
-  onSortChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.sortBy = select.value;
-    this.sortAnimals();
-  }
+        this.totalItems = sorted.length;
+        this.totalPages = Math.ceil(this.totalItems / pageSize);
+        this.currentPage = pageIndex;
 
-  filterAnimals(): void {
-    if (!this.searchTerm) {
-      this.animalesFiltrados = [...this.animalesDadosDeBaja];
-    } else {
-      this.animalesFiltrados = this.animalesDadosDeBaja.filter(animal =>
-        animal.inventoryNumber.toLowerCase().includes(this.searchTerm) ||
-        animal.specimenName.toLowerCase().includes(this.searchTerm) ||
-        animal.genus.toLowerCase().includes(this.searchTerm) ||
-        animal.species.toLowerCase().includes(this.searchTerm) ||
-        animal.causeName.toLowerCase().includes(this.searchTerm) ||
-        (animal.commonName && animal.commonName.toLowerCase().includes(this.searchTerm))
-      );
-    }
-    this.calculateTotalPages();
-    this.currentPage = 0;
-    this.sortAnimals();
-  }
+        const start = pageIndex * pageSize;
+        const end = start + pageSize;
 
-  sortAnimals(): void {
-    this.animalesFiltrados.sort((a, b) => {
-      switch (this.sortBy) {
-        case 'identificador':
-          return a.inventoryNumber.localeCompare(b.inventoryNumber);
-        case 'genero':
-          return a.genus.localeCompare(b.genus);
-        case 'especie':
-          return a.species.localeCompare(b.species);
-        case 'fechaBaja':
-          return new Date(b.deregistrationDate).getTime() - new Date(a.deregistrationDate).getTime();
-        default:
-          return 0;
-      }
+        // Retorna la porción de datos de la página actual
+        return sorted.slice(start, end);
+      })
+    );
+
+    // Manejo de errores y finalización de carga
+    this.animalesFiltrados$.subscribe({
+      next: (data) => console.log('View Data (Filtered/Sorted):', data),
+      error: (err) => {
+        console.error('Error al cargar animales dados de baja:', err);
+        this.error = 'Error al cargar los animales dados de baja.';
+        this.isLoading = false;
+      },
+      complete: () => this.isLoading = false
     });
   }
 
-  onItemsPerPageChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.itemsPerPage = Number(select.value);
-    this.currentPage = 0;
-    this.calculateTotalPages();
+  toggleMenu(animalId: number): void {
+    console.log('Toggle Menu Clicked. ID:', animalId);
+    this.menuAbiertoId = (this.menuAbiertoId === animalId) ? null : animalId;
   }
 
-  goToPage(page: number): void {
-    if (page >= 0 && page < this.totalPages) {
-      this.currentPage = page;
+  // Método requerido por el input de búsqueda
+  onSearch(event: Event): void {
+    const searchTerm = (event.target as HTMLInputElement).value;
+    this.searchSubject.next(searchTerm.toLowerCase());
+    this.pageIndexSubject.next(0); // Reiniciar paginación
+  }
+
+  // Método requerido por el select de ordenación
+  onSortChange(event: Event): void {
+    const field = (event.target as HTMLSelectElement).value;
+    this.sortSubject.next({ field, direction: 'asc' });
+    this.pageIndexSubject.next(0); // Reiniciar paginación
+  }
+
+  // Método requerido por el select de elementos por página
+  onItemsPerPageChange(event: Event): void {
+    const pageSize = parseInt((event.target as HTMLSelectElement).value, 10);
+    this.pageSizeSubject.next(pageSize);
+    this.pageIndexSubject.next(0);
+  }
+
+  // Navegación de paginación
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.pageIndexSubject.next(this.currentPage - 1);
     }
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
+      this.pageIndexSubject.next(this.currentPage + 1);
     }
   }
 
-  previousPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    }
-  }
-
-  calculateTotalPages(): void {
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    if (this.totalPages === 0) this.totalPages = 1;
+  goToPage(index: number): void {
+    this.pageIndexSubject.next(index);
   }
 
   getPaginationInfo(): string {
-    if (this.totalItems === 0) return '0-0 de 0 items';
-    const start = this.currentPage * this.itemsPerPage + 1;
-    const end = Math.min((this.currentPage + 1) * this.itemsPerPage, this.totalItems);
-    return `${start}-${end} de ${this.totalItems} items`;
+    if (this.totalItems === 0) return '0 - 0 de 0 items';
+    const start = (this.currentPage * this.pageSizeSubject.getValue()) + 1;
+    let end = (this.currentPage + 1) * this.pageSizeSubject.getValue();
+    end = Math.min(end, this.totalItems);
+    return `${start} - ${end} de ${this.totalItems} items`;
   }
 
-  getPaginatedAnimals(): DeregistrationRecord[] {
-    const start = this.currentPage * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.animalesFiltrados.slice(start, end);
-  }
+  private applyFilter(animales: RegistroBajaDetalleResponse[], term: string): RegistroBajaDetalleResponse[] {
+    if (!term) return animales;
 
-  getVisiblePages(): number[] {
-    const pages: number[] = [];
-    const maxVisible = 5;
-    
-    if (this.totalPages <= maxVisible) {
-      for (let i = 0; i < this.totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      let start = Math.max(0, this.currentPage - Math.floor(maxVisible / 2));
-      let end = Math.min(this.totalPages, start + maxVisible);
-      
-      if (end - start < maxVisible) {
-        start = Math.max(0, end - maxVisible);
-      }
-      
-      for (let i = start; i < end; i++) {
-        pages.push(i);
-      }
-    }
-    
-    return pages;
-  }
+    return animales.filter(animal => {
+      const searchBase = [
+        animal.numInventario,
+        animal.genero,
+        animal.especieNombre,
+        animal.causaBajaNombre,
+        animal.nombreComun,
+        animal.nombreEspecimen
+      ].join(' ').toLowerCase();
 
-  toggleMenu(event: Event): void {
-    const button = event.currentTarget as HTMLButtonElement;
-    const menu = button.nextElementSibling as HTMLElement;
-    
-    document.querySelectorAll('.actions-menu.show').forEach(m => {
-      if (m !== menu) m.classList.remove('show');
+      return searchBase.includes(term);
     });
-    
-    menu.classList.toggle('show');
-    
-    const closeMenu = (e: MouseEvent) => {
-      if (!button.contains(e.target as Node) && !menu.contains(e.target as Node)) {
-        menu.classList.remove('show');
-        document.removeEventListener('click', closeMenu);
+  }
+
+  private applySort(animales: RegistroBajaDetalleResponse[], field: string, direction: string): RegistroBajaDetalleResponse[] {
+    const sortedAnimals = [...animales];
+
+    if (!field) return sortedAnimals;
+
+    sortedAnimals.sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (field) {
+        case 'identificador':
+          aValue = a.numInventario;
+          bValue = b.numInventario;
+          break;
+        case 'genero':
+          aValue = a.genero;
+          bValue = b.genero;
+          break;
+        case 'especie':
+          aValue = a.especieNombre;
+          bValue = b.especieNombre;
+          break;
+        case 'fechaBaja':
+          aValue = new Date(a.fechaBaja).getTime();
+          bValue = new Date(b.fechaBaja).getTime();
+          break;
+        default:
+          return 0;
       }
-    };
-    
-    setTimeout(() => document.addEventListener('click', closeMenu), 0);
+
+      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return sortedAnimals;
   }
 
+  // Acciones
   viewDetails(specimenId: number): void {
-    console.log('Ver detalles del especimen:', specimenId);
+    this.router.navigate(['/app/removals/details', specimenId]);
   }
 
-  viewReport(deregistrationId: number): void {
-    console.log('Ver reporte de baja:', deregistrationId);
+  viewReport(specimenId: number): void {
+    this.router.navigate(['/app/reports/history', specimenId], { queryParams: { origin: 'removals' } });
+  }
+
+  editDeregistration(specimenId: number): void {
+    this.router.navigate(['/app/animals/deregister/edit', specimenId]);
   }
 }

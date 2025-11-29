@@ -1,0 +1,107 @@
+<div *ngIf="isLoading" class="loading-state">
+    <p>Cargando detalles de la baja...</p>
+</div>
+
+<div *ngIf="error" class="error-state">
+    <p>Error: {{ error }}</p>
+</div>
+
+<div *ngIf="animal" class="main-content">
+    <header class="main-header">
+        <div class="page-name">
+            <nav class="breadcrumb-nav">
+                <a routerLink="/app/animals">Animales</a>
+                <mat-icon>chevron_right</mat-icon>
+                <a routerLink="/app/removals">Bajas</a>
+                <mat-icon>chevron_right</mat-icon>
+                <a routerLink="./">Ejemplar <span id="ID_animal">{{ animal.numInventario }}</span></a>
+            </nav>
+            <h1 id="ID_animal_H1">{{ animal.nombreEspecimen }}</h1>
+            <h2>
+                <span id="genero">{{ animal.genero }}</span>
+                <span id="especie">{{ animal.especieNombre }}</span>
+            </h2>
+        </div>
+        <div class="back-btn">
+            <a routerLink="/app/removals">
+                <mat-icon>arrow_back</mat-icon>
+                Regresar
+            </a>
+        </div>
+    </header>
+
+    <div class="animal-details">
+
+        <div class="detail-card">
+            <h3>Información taxonómica</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>science</mat-icon> Género:</span>
+                <span class="value">{{ animal.genero }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>biotech</mat-icon> Especie:</span>
+                <span class="value">{{ animal.especieNombre }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>label</mat-icon> Nombre común:</span>
+                <span class="value">{{ animal.nombreComun }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Identificación y registro</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>inventory</mat-icon> Número de inventario:</span>
+                <span class="value">{{ animal.numInventario }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>event</mat-icon> Fecha de ingreso:</span>
+                <span class="value">{{ formatDate(animal.fechaIngreso) }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>check_circle</mat-icon> Estado:</span>
+                <span class="value status-baja">Baja</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Origen y procedencia</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>visibility</mat-icon> Origen:</span>
+                <span class="value">{{ animal.origen }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>map</mat-icon> Procedencia:</span>
+                <span class="value">{{ animal.procedencia }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Información de baja</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>event_busy</mat-icon> Fecha de baja:</span>
+                <span class="value">{{ formatDate(animal.fechaBaja) }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>cancel</mat-icon> Causa de baja:</span>
+                <span class="value cause-baja">{{ animal.causaBajaNombre }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Historial de reportes</h3>
+            <a [routerLink]="['/app/reports/history', animal.especimenId]" [queryParams]="{ origin: 'removals' }"
+                class="report-history-btn">
+                <mat-icon>description</mat-icon>
+            </a>
+        </div>
+
+        <div class="detail-card">
+            <h3>Información descriptiva</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>border_color</mat-icon> Observaciones de baja:</span>
+                <span class="value observaciones-baja">{{ animal.observacion || 'Sin observaciones' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
