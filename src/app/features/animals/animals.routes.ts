@@ -12,8 +12,18 @@ export const animalRoutes: Routes = [
             .then(m => m.RegisterFormView)
     },
     {
+        path: 'edit/:id',
+        loadComponent: () => import('./register-form-edit.view/register-form-edit.view')
+            .then(m => m.RegisterFormEditView)
+    },
+    {
+        path: 'more_info/:id',
+        loadComponent: () => import('./animal-details.view/animal-details.view')
+            .then(m => m.AnimalDetailsView)
+    },
+    {
         path: 'deregister/:id',  
         loadComponent: () => import('./deregister-form.view/deregister-form.view')
             .then(m => m.DeregisterFormView)
-}
+    }
 ];

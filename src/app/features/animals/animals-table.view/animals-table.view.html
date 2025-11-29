@@ -40,6 +40,7 @@
             </div>
         </div>
     </section>
+
     <section class="main-body">
         <div class="table-container">
             <table class="table" id="mammalsTable">
@@ -56,35 +57,43 @@
                     </tr>
                 </thead>
                 <tbody id="mammalsTableBody">
-                    <tr *ngFor="let animal of animalesFiltrados">
-                        <td>{{ animal.numInventario }}</td>
-                        <td>{{ animal.genero }}</td>
-                        <td>{{ animal.especie }}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>{{ animal.fechaNacimiento || 'N/A' }}</td>
-                        <td>-</td>
-                        <td class="actions-cell">
-                            <button class="actions-btn" (click)="toggleMenu($event)">
-                                <mat-icon>more_vert</mat-icon>
-                            </button>
-                            <div class="actions-menu">
-                                <a [routerLink]="['/animals/edit', animal.id]">
-                                    <mat-icon>edit</mat-icon>
-                                    <span>Editar</span>
-                                </a>
-                                <a [routerLink]="['/animals/deregister', animal.id]">
-                                    <mat-icon>delete</mat-icon>
-                                    <span>Dar de baja</span>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr *ngIf="animalesFiltrados.length === 0 && !isLoading">
-                        <td colspan="8" style="text-align: center; padding: 20px;">
-                            No se encontraron animales
-                        </td>
-                    </tr>
+                    <ng-container *ngIf="animalesFiltrados$ | async as animales">
+                        <tr *ngFor="let animal of animales">
+                            <td>{{ animal.numInventario }}</td>
+                            <td>{{ animal.genero }}</td>
+                            <td>{{ animal.especieNombre }}</td>
+                            <td>{{ animal.registroAlta.origenAltaNombre }}</td>
+                            <td>{{ animal.registroAlta.procedencia || 'N/A' }}</td>
+                            <td>{{ animal.registroAlta.fechaIngreso | date:'dd/MM/yyyy' }}</td> <td>{{ animal.registroAlta.traslado.areaDestino || 'N/A' }}</td>
+                            
+                            <td class="actions-cell">
+                                <button class="actions-btn" (click)="toggleMenu(animal.id)">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <div class="actions-menu" [class.visible]="menuAbiertoId === animal.id">
+                                    <a [routerLink]="['edit', animal.id]">
+                                        <mat-icon>edit</mat-icon>
+                                        <span>Editar</span>
+                                    </a>
+                                    <a [routerLink]="['more-info', animal.id]">
+                                        <mat-icon>info</mat-icon>
+                                        <span>Más info</span>
+                                    </a>
+                                    <a *ngIf="animal.activo" [routerLink]="['deregister', animal.id]">
+                                        <mat-icon>close</mat-icon>
+                                        <span>Dar de baja</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr *ngIf="animales.length === 0 && !isLoading">
+                            <td colspan="8" style="text-align: center; padding: 20px;">
+                                No se encontraron animales
+                            </td>
+                        </tr>
+                    </ng-container>
+                    
                     <tr *ngIf="isLoading">
                         <td colspan="8" style="text-align: center; padding: 20px;">
                             Cargando...

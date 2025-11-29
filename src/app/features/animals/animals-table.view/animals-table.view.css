@@ -339,7 +339,7 @@ tbody tr td:last-child{
     border: none;
 }
 
-.actions-menu.show{
+.actions-menu.visible{
     display: flex;
 }
 

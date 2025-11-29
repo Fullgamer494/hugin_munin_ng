@@ -1,71 +1,43 @@
 <div class="main-content">
-    <header class="main-header">
-        <div class="page-name">
-            <nav class="breadcrumb-nav">
-                <a routerLink="../" class="animals">Animales</a>
-                <span><mat-icon>keyboard_arrow_right</mat-icon></span>
-                <a routerLink="./">Registrar ejemplar</a>
-            </nav>
-            <h1>Registrar ejemplar</h1>
-        </div>
-    </header>
-    
-    <form id="registerSpecimen" class="form" (submit)="onSubmit($event)">
+    <form [formGroup]="specimenForm" (ngSubmit)="onSubmit()" id="registerSpecimen" class="form">
+        
         <section class="form-section">
             <header class="form-section-header">
-                <button 
-                    #toggleBtn
-                    type="button" 
-                    class="toggle-btn" 
-                    aria-expanded="true" 
-                    data-target="identificacion"
-                    (click)="toggleSection($event, 0)">
+                <button #toggleBtn type="button" class="toggle-btn" aria-expanded="true" data-target="identificacion" (click)="toggleSection($event, 0)">
                     <span class="toggle-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
                     <h2>Identificación</h2>
                 </button>
             </header>
             <div #sectionBody class="form-section-body showed" id="identificacion">
                 <div class="form-group">
-                    <label for="NI_animal">Número de inventario:</label>
+                    <label for="numInventario">Número de inventario:</label>
                     <input 
                         type="text" 
-                        id="NI_animal" 
-                        name="NI_animal" 
+                        id="numInventario" 
+                        name="numInventario" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="numInventario"> </div>
                 <div class="form-group">
-                    <label for="nombre_especimen">Nombre de espécimen:</label>
+                    <label for="nombreEspecimen">Nombre de espécimen:</label>
                     <input 
                         type="text" 
-                        id="nombre_especimen" 
-                        name="nombre_especimen"
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        id="nombreEspecimen" 
+                        name="nombreEspecimen"
+                        formControlName="nombreEspecimen"> </div>
                 <div class="form-group">
-                    <label for="fecha_ingreso">Fecha de ingreso:</label>
+                    <label for="fechaIngreso">Fecha de ingreso:</label>
                     <input 
                         type="date" 
-                        id="fecha_ingreso" 
-                        name="fecha_ingreso" 
+                        id="fechaIngreso" 
+                        name="fechaIngreso" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="fechaIngreso"> </div>
             </div>
         </section>
 
         <section class="form-section">
             <header class="form-section-header">
-                <button 
-                    #toggleBtn
-                    type="button" 
-                    class="toggle-btn" 
-                    aria-expanded="false" 
-                    data-target="clasificacion_taxonomica"
-                    (click)="toggleSection($event, 1)">
+                <button #toggleBtn type="button" class="toggle-btn" aria-expanded="false" data-target="clasificacion_taxonomica" (click)="toggleSection($event, 1)">
                     <span class="toggle-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
                     <h2>Clasificación taxonómica</h2>
                 </button>
@@ -78,45 +50,33 @@
                         id="genero" 
                         name="genero" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="genero"> </div>
                 <div class="form-group">
-                    <label for="especie">Especie:</label>
+                    <label for="especieNombre">Especie:</label>
                     <input 
                         type="text" 
-                        id="especie" 
-                        name="especie" 
+                        id="especieNombre" 
+                        name="especieNombre" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="especieNombre"> </div>
             </div>
         </section>
         
         <section class="form-section">
             <header class="form-section-header">
-                <button 
-                    #toggleBtn
-                    type="button" 
-                    class="toggle-btn" 
-                    aria-expanded="false" 
-                    data-target="informacion_de_procedencia"
-                    (click)="toggleSection($event, 2)">
+                <button #toggleBtn type="button" class="toggle-btn" aria-expanded="false" data-target="informacion_de_procedencia" (click)="toggleSection($event, 2)">
                     <span class="toggle-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
                     <h2>Información de procedencia</h2>
                 </button>
             </header>
             <div #sectionBody class="form-section-body" id="informacion_de_procedencia">
                 <div class="form-group">
-                    <label for="id_origen">Origen:</label>
+                    <label for="origenAltaId">Origen:</label>
                     <select 
-                        id="id_origen" 
-                        name="id_origen" 
+                        id="origenAltaId" 
+                        name="origenAltaId" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (change)="onFieldInput($event)">
-                        <option value="1">Donación</option>
+                        formControlName="origenAltaId"> <option value="1">Donación</option>
                         <option value="2">Rescate</option>
                         <option value="3">Incautado</option>
                         <option value="4">Abandono</option>
@@ -132,104 +92,80 @@
                         id="procedencia" 
                         name="procedencia" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="procedencia"> </div>
             </div>
         </section>
 
         <section class="form-section">
             <header class="form-section-header">
-                <button 
-                    #toggleBtn
-                    type="button" 
-                    class="toggle-btn" 
-                    aria-expanded="false" 
-                    data-target="ubicacion_actual"
-                    (click)="toggleSection($event, 3)">
+                <button #toggleBtn type="button" class="toggle-btn" aria-expanded="false" data-target="ubicacion_actual" (click)="toggleSection($event, 3)">
                     <span class="toggle-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
                     <h2>Ubicación actual</h2>
                 </button>
             </header>
             <div #sectionBody class="form-section-body" id="ubicacion_actual">
                 <div class="form-group">
-                    <label for="area_origen">Área origen:</label>
+                    <label for="areaOrigen">Área origen:</label>
                     <select 
-                        id="area_origen" 
-                        name="area_origen" 
+                        id="areaOrigen" 
+                        name="areaOrigen" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (change)="onFieldInput($event)">
-                        <option value="Externo">Externo</option>
+                        formControlName="areaOrigen"> <option value="Externo">Externo</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="area_destino">Área destino:</label>
+                    <label for="areaDestino">Área destino:</label>
                     <select 
-                        id="area_destino" 
-                        name="area_destino" 
+                        id="areaDestino" 
+                        name="areaDestino" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (change)="onFieldInput($event)">
-                        <option value="Cuarentena">Cuarentena</option>
+                        formControlName="areaDestino"> <option value="Cuarentena">Cuarentena</option>
                         <option value="Exhibición">Exhibición</option>
                         <option value="Guardería">Guardería</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="ubicacion_origen">Ubicación origen:</label>
+                    <label for="ubicacionOrigen">Ubicación origen:</label>
                     <input 
                         type="text" 
-                        id="ubicacion_origen" 
-                        name="ubicacion_origen" 
+                        id="ubicacionOrigen" 
+                        name="ubicacionOrigen" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="ubicacionOrigen"> </div>
                 <div class="form-group">
-                    <label for="ubicacion_destino">Ubicación destino:</label>
+                    <label for="ubicacionDestino">Ubicación destino:</label>
                     <input 
                         type="text" 
-                        id="ubicacion_destino" 
-                        name="ubicacion_destino" 
+                        id="ubicacionDestino" 
+                        name="ubicacionDestino" 
                         required
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                </div>
+                        formControlName="ubicacionDestino"> </div>
             </div>
         </section>
 
         <section class="form-section">
             <header class="form-section-header">
-                <button 
-                    #toggleBtn
-                    type="button" 
-                    class="toggle-btn" 
-                    aria-expanded="false" 
-                    data-target="informacion_descriptiva"
-                    (click)="toggleSection($event, 4)">
+                <button #toggleBtn type="button" class="toggle-btn" aria-expanded="false" data-target="informacion_descriptiva" (click)="toggleSection($event, 4)">
                     <span class="toggle-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
                     <h2>Información descriptiva</h2>
                 </button>
             </header>
             <div #sectionBody class="form-section-body" id="informacion_descriptiva">
                 <div class="form-group form-notes">
-                    <label for="observaciones_ingreso">Observaciones de ingreso:</label>
+                    <label for="observacionAlta">Observaciones de ingreso:</label>
                     <textarea 
-                        id="observaciones_ingreso" 
-                        name="observaciones_ingreso" 
+                        id="observacionAlta" 
+                        name="observacionAlta" 
                         rows="4" 
-                        placeholder="Describa características especiales del animal (color, marcas, comportamiento, etc.)"
-                        (blur)="onFieldBlur($event)"
-                        (input)="onFieldInput($event)">
-                    </textarea>
+                        placeholder="Describa características especiales del animal..."
+                        formControlName="observacionAlta"> </textarea>
                 </div>
             </div>
         </section>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-submit" id="submitBtn">
-                Agregar
+            <button type="submit" class="btn btn-submit" id="submitBtn" [disabled]="isSaving">
+                {{ isSaving ? 'Guardando...' : 'Agregar' }}
             </button>
             <a href="javascript:history.back()" class="btn-reset">
                 Cancelar
