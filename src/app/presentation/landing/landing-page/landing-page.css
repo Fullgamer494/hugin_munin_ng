@@ -19,6 +19,11 @@
   --title-sec-size: 2.25rem;
 }
 
+a{
+  text-decoration: none;
+  color: #0C0F0A;
+}
+
 .hero {
   display: flex;
   justify-content: center;

@@ -1,7 +1,8 @@
+// src/app/presentation/login/login-form/login-form.ts
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/infrastructure/adapters/auth/auth.service';
+import { LoginService } from '../../../api/application/login.service'; // ✅ De la carpeta API
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -13,15 +14,16 @@ import { CommonModule } from '@angular/common';
 })
 export class LoginFormComponent {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  private loginService = inject(LoginService);
   private router = inject(Router);
 
   passwordFieldType: string = 'password';
   errorMessage: string = '';
   
+  // ✅ Los campos deben coincidir con LoginRequest en auth.model.ts
   loginForm: FormGroup = this.fb.group({
-    username: ['', [Validators.required, Validators.email]], 
-    password: ['', [Validators.required]]
+    correo: ['', [Validators.required, Validators.email]], 
+    contrasena: ['', [Validators.required]]
   });
 
   togglePasswordVisibility(event: Event) {
@@ -31,22 +33,26 @@ export class LoginFormComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      // Adaptamos el objeto para enviarlo al servicio como 'email'
       const loginData = {
-        email: this.loginForm.value.username, // Mapeamos username 
-        password: this.loginForm.value.password
+        correo: this.loginForm.value.correo,
+        contrasena: this.loginForm.value.contrasena
       };
 
-      this.authService.login(loginData).subscribe({
-        next: () => {
-          this.router.navigate(['/app/dashboard']);        },
+      console.log('🚀 Enviando login:', loginData);
+
+      this.loginService.login(loginData).subscribe({
+        next: (response) => {
+          console.log('✅ Login exitoso:', response);
+          // El token ya se guardó en AuthAdapter
+          this.router.navigate(['/app/dashboard']);
+        },
         error: (err) => {
-          console.error(err);
+          console.error('❌ Error en login:', err);
           this.errorMessage = 'Correo o contraseña incorrectos.';
         }
       });
     } else {
-        this.loginForm.markAllAsTouched();
+      this.loginForm.markAllAsTouched();
     }
   }
 }

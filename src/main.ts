@@ -1,6 +1,21 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { App } from './app/app';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+import { AuthAdapter } from './app/api/infrastructure/adapters/auth.adapter';
+import { AuthInterceptor } from './app/api/interceptors/auth.interceptors';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor])),
+    
+    // ✅ AGREGA ESTO - Proveedor para el sistema de autenticación
+    { provide: AuthPort, useClass: AuthAdapter },
+    
+    // Tus demás proveedores...
+    { provide: ReportRepository, useClass: ReportRepositoryImpl },
+    // ... resto de proveedores
+  ]
+};

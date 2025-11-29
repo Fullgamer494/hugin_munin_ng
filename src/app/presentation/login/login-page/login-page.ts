@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../landing/header/header';
 import { LoginFormComponent } from '../login-form/login-form'; 
 
 @Component({
@@ -7,6 +8,7 @@ import { LoginFormComponent } from '../login-form/login-form';
   standalone: true,
   imports: [
     CommonModule,
+    HeaderComponent,
     LoginFormComponent 
   ],
   templateUrl: './login-page.html',
