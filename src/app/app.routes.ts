@@ -45,6 +45,11 @@ export const routes: Routes = [
                 path: 'removals',
                 loadChildren: () => import('./features/removals/removals.routes')
                     .then(m => m.removalsRoutes)
+            },
+            {
+                path: 'reports',
+                loadChildren: () => import('./features/reports/reports.routes')
+                    .then(m => m.reportRoutes)
             }
         ]
     },
