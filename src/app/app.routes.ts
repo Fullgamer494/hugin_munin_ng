@@ -1,33 +1,27 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/infrastructure/guards/auth.guard';
+import { authGuard } from './api/infrastructure/guards/auth.guard';
 
 export const routes: Routes = [
-    // =======================================================
-    // 1. ZONA PÚBLICA (Landing y Login) - Sin Guard
-    // =======================================================
     {
         path: '',
         loadComponent: () => import('./layouts/public.layout/public.layout')
             .then(m => m.PublicLayout),
         children: [
             {
-                path: '', // localhost:4200 -> Landing
+                path: '',
                 loadComponent: () => import('./presentation/landing/landing-page/landing-page')
                     .then(m => m.LandingPageComponent)
             },
             {
-                path: 'login', // localhost:4200/login -> Login
+                path: 'login',
                 loadComponent: () => import('./presentation/login/login-page/login-page')
                     .then(m => m.LoginPageComponent)
             }
         ]
     },
 
-    // =======================================================
-    // 2. ZONA PRIVADA (Dashboard, Animales, etc.) - Con Guard
-    // =======================================================
     {
-        path: 'app', // Prefijo para rutas protegidas
+        path: 'app',
         canActivate: [authGuard],
         loadComponent: () => import('./layouts/private.layout/private.layout')
             .then(m => m.PrivateLayout),
@@ -60,9 +54,6 @@ export const routes: Routes = [
         ]
     },
 
-    // =======================================================
-    // 3. WILDCARD: Rutas desconocidas -> Landing
-    // =======================================================
     {
         path: '**',
         redirectTo: ''

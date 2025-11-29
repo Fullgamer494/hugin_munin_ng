@@ -1,8 +1,7 @@
-// src/app/presentation/login/login-form/login-form.ts
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoginService } from '../../../api/application/login.service'; // ✅ De la carpeta API
+import { LoginService } from '../../../api/application/login.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,10 +19,9 @@ export class LoginFormComponent {
   passwordFieldType: string = 'password';
   errorMessage: string = '';
   
-  // ✅ Los campos deben coincidir con LoginRequest en auth.model.ts
   loginForm: FormGroup = this.fb.group({
-    correo: ['', [Validators.required, Validators.email]], 
-    contrasena: ['', [Validators.required]]
+    email: ['', [Validators.required, Validators.email]], 
+    password: ['', [Validators.required]]
   });
 
   togglePasswordVisibility(event: Event) {
@@ -34,21 +32,24 @@ export class LoginFormComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const loginData = {
-        correo: this.loginForm.value.correo,
-        contrasena: this.loginForm.value.contrasena
+        correo: this.loginForm.value.email,
+        contrasena: this.loginForm.value.password
       };
 
-      console.log('🚀 Enviando login:', loginData);
-
       this.loginService.login(loginData).subscribe({
-        next: (response) => {
-          console.log('✅ Login exitoso:', response);
-          // El token ya se guardó en AuthAdapter
+        next: () => {
           this.router.navigate(['/app/dashboard']);
         },
         error: (err) => {
-          console.error('❌ Error en login:', err);
-          this.errorMessage = 'Correo o contraseña incorrectos.';
+          console.error('Error en login:', err);
+          
+          if (err.status === 401) {
+            this.errorMessage = 'Credenciales incorrectas.';
+          } else if (err.status === 0) {
+            this.errorMessage = 'No se puede conectar con el servidor.';
+          } else {
+            this.errorMessage = 'Error al iniciar sesión. Intenta nuevamente.';
+          }
         }
       });
     } else {
