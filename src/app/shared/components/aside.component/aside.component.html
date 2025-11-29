@@ -2,12 +2,12 @@
     <nav>
         <ul class="nav-list">
             <li class="nav-item">
-                <a routerLink="">
+                <a routerLink="/app/dashboard">
                     <mat-icon fontSet="material-icons-round">home</mat-icon>
                 </a>
             </li>
             <li class="nav-item">
-                <a routerLink="animals">
+                <a routerLink="/app/animals">
                     <mat-icon>pets</mat-icon>
                 </a>
             </li>
@@ -17,25 +17,25 @@
                 </button>
                 <ul class="subnav-list" [class.active]="isSubnavOpen">
                     <li class="subnav-item">
-                        <a routerLink="reports/clinical" (click)="closeSubnav()">
+                        <a routerLink="/app/reports/clinical" (click)="closeSubnav()">
                             <span>Clínico</span>
                             <mat-icon fontSet="material-symbols-outlined">health_cross</mat-icon>
                         </a>
                     </li>
                     <li class="subnav-item">
-                        <a routerLink="reports/behavioral" (click)="closeSubnav()">
+                        <a routerLink="/app/reports/behavioral" (click)="closeSubnav()">
                             <span>Conductual</span>
                             <mat-icon fontSet="material-symbols-outlined">target</mat-icon>
                         </a>
                     </li>
                     <li class="subnav-item">
-                        <a routerLink="reports/dietary" (click)="closeSubnav()">
+                        <a routerLink="/app/reports/dietary" (click)="closeSubnav()">
                             <span>Alimenticio</span>
                             <mat-icon fontSet="material-symbols-outlined">pet_supplies</mat-icon>
                         </a>
                     </li>
                     <li class="subnav-item">
-                        <a routerLink="reports/death" (click)="closeSubnav()">
+                        <a routerLink="/app/reports/death" (click)="closeSubnav()">
                             <span>Defunción</span>
                             <mat-icon fontSet="material-symbols-outlined">skull</mat-icon>
                         </a>
@@ -43,14 +43,14 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a routerLink="removals">
+                <a routerLink="/app/removals">
                     <mat-icon>inventory_2</mat-icon>
                 </a>
             </li>
             <li class="nav-item logout">
-                <a routerLink="logout">
+                <button type="button" (click)="onLogout()">
                     <mat-icon>logout</mat-icon>
-                </a>
+                </button>
             </li>
         </ul>
     </nav>

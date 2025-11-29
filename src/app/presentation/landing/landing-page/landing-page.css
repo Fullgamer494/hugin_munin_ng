@@ -1,0 +1,246 @@
+/* Variables locales del componente */
+:host {
+  --night: #0C0F0A;
+  --bg: #FBFBFB;
+  --main-green: #84BC0D;
+  --btn-green: #A7D14D;
+  
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.625rem;
+  --spacing-md: 1.25rem;
+  --spacing-lg: 1.875rem;
+  --spacing-xl: 2.5rem;
+  
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-xl: 1.5rem;
+  
+  --p-size: 0.875rem;
+  --title-sec-size: 2.25rem;
+}
+
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
+}
+
+.hero__text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  z-index: 1000;
+}
+
+.hero__text h1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero__text h1 span {
+  text-align: center;
+  font-family: 'Freckle Face', cursive;
+  font-size: 6.25rem;
+  color: var(--bg);
+}
+
+.hero__text p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--p-size);
+  color: var(--bg);
+}
+
+.hero__text .btn-cta {
+  width: 90%;
+  padding: var(--spacing-sm);
+  background-color: var(--main-green);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: var(--p-size);
+  font-weight: 550;
+  transition: background-color 0.2s ease;
+}
+
+.hero__text .btn-cta:hover {
+  background-color: var(--btn-green);
+}
+
+.hero picture {
+  width: 100%;
+  height: 100%;
+}
+
+.hero picture img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+  filter: brightness(60%);
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: var(--spacing-xl);
+  width: 100vw;
+  padding: var(--spacing-xl) var(--spacing-sm);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: 0 var(--spacing-sm);
+}
+
+.text h2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  margin-bottom: var(--spacing-md);
+}
+
+.text h2 span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: var(--title-sec-size);
+}
+
+.italic-green {
+  font-style: italic;
+  color: var(--main-green);
+}
+
+.italic-underline {
+  font-style: italic;
+  text-decoration: underline;
+}
+
+.function__text {
+  align-items: end;
+}
+
+.text p {
+  letter-spacing: 0.02em;
+  text-align: justify;
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--p-size);
+  line-height: 1.6;
+}
+
+.img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: 0 var(--spacing-sm);
+}
+
+.function__img {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.img img {
+  width: 100%;
+  height: 25rem;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+}
+
+.function__img img {
+  height: 18.75rem;
+}
+
+.function__img img:last-child {
+  grid-column: span 2;
+}
+
+.our-team {
+  width: 100vw;
+  padding: var(--spacing-sm);
+}
+
+.our-team h2 {
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: var(--title-sec-size);
+  color: var(--main-green);
+  margin-bottom: var(--spacing-md);
+}
+
+.our-team__img {
+  width: 100%;
+  padding: var(--spacing-md);
+}
+
+.our-team__img img {
+  width: 100%;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+}
+
+@media screen and (min-width: 1024px) {
+  :host {
+    --p-size: 1.25rem;
+    --title-sec-size: 3rem;
+  }
+
+  .hero__text {
+    left: 10%;
+  }
+
+  .hero picture img {
+    filter: brightness(100%);
+  }
+
+  section {
+    flex-direction: row;
+  }
+
+  .what-is__img img {
+    height: 31.25rem;
+  }
+
+  .function {
+    flex-direction: row-reverse;
+  }
+
+  .our-team {
+    flex-direction: column;
+  }
+
+  .our-team__img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 37.5rem;
+  }
+
+  .our-team__img img {
+    width: 80%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

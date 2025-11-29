@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { CookieService } from '../storage/cookie.service';
 import { environment } from '../../../../../environments/environment';
@@ -19,25 +20,34 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private router: Router
   ) {}
 
   login(credentials: { email: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
+        // Guardar datos de sesión
         this.cookieService.set('auth_token', response.token, 7);
         this.cookieService.set('user_id', response.userId.toString(), 7);
         this.cookieService.set('user_name', response.userName, 7);
         this.cookieService.set('user_role', response.role, 7);
+        
+        // Redirigir al dashboard después de login exitoso
+        this.router.navigate(['/app/dashboard']);
       })
     );
   }
 
   logout(): void {
+    // Limpiar cookies
     this.cookieService.delete('auth_token');
     this.cookieService.delete('user_id');
     this.cookieService.delete('user_name');
     this.cookieService.delete('user_role');
+    
+    // Redirigir al landing
+    this.router.navigate(['/']);
   }
 
   isAuthenticated(): boolean {

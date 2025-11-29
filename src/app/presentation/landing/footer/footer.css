@@ -1,0 +1,123 @@
+footer{
+    width: 100vw;
+    height: 14vh;
+    padding: clamp(8px, 10px, 10px);
+}
+
+.footer-content{
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 70% 25%;
+
+    width: 100%;
+    height: 100%;
+    padding: clamp(8px, 10px, 10px) clamp(8px, 10px, 10px) 0 clamp(8px, 10px, 10px);
+    
+    background-color: var(--night);
+    border-radius: clamp(12px, 18px, 24px);
+}
+
+.footer-content__text{
+    grid-column: 1;
+    grid-row: 1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+
+    padding-left: 10px;
+}
+
+.footer-content__text h3{
+    font-family: 'Freckle Face';
+    font-size: 20px;
+    color: var(--bg);
+}
+
+.footer-content__text p{
+    font-family: 'Poppins';
+    font-size: 14px;    
+    color: var(--bg);
+}
+
+.footer-content__socials{
+    grid-column: 2;
+    grid-row: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-content__socials ul{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+}
+
+.footer-content__socials ul li{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: var(--title-sec-size);
+    height: var(--title-sec-size);
+
+    background-color: #1E1E1E;
+    border-radius: clamp(8px, 10px, 10px);
+}
+
+.footer-content__socials ul li a i{
+    font-size: 24px;
+    color: var(--bg);
+}
+
+.footer-content__copyright{
+    grid-column: 1 / span 2;
+    grid-row: 2;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-content__copyright p{
+    text-align: center;
+    font-family: 'Poppins';
+    font-size: 12px;
+    color: var(--bg);
+}
+
+@media screen and (min-width: 1024px) {
+    .footer-content__text{
+        align-items: center;
+
+        padding-left: 0;
+    }
+
+    .footer-content__text h3{
+        width: 250px;
+
+        text-align: left;
+        font-size: 24px;
+    }
+
+    .footer-content p{
+        width: 250px;
+        
+        text-align: left;
+    }
+
+    .footer-content__socials ul{
+        justify-content: space-evenly;
+    }
+
+    .footer-content__copyright p{
+        width: auto;
+
+        text-align: center;
+    }
+}

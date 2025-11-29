@@ -1,0 +1,23 @@
+<form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    
+    <label for="username" class="username">Usuario:</label>
+    <input type="text" id="username" formControlName="username" required>
+
+    <label for="password" class="password">Contraseña:</label>
+    <div class="password-container">
+        <input [type]="passwordFieldType" id="password" formControlName="password" required>
+        <i class="ti ti-eye toggle-password" id="togglePassword" (click)="togglePasswordVisibility($event)"></i>
+    </div>
+
+    <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        @if (errorMessage) {
+        <div class="error-alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ errorMessage }}</span>
+        </div>
+        }
+
+        <button type="submit" [disabled]="!loginForm.valid">Iniciar sesión</button>
+    </form>
+
+</form>

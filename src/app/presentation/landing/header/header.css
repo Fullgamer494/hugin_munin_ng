@@ -1,0 +1,203 @@
+/* Variables locales del componente */
+:host {
+  --night: #0C0F0A;
+  --bg: #FBFBFB;
+  --white: #FFFFFF;
+  --btn-green: #A7D14D;
+  --stroke: #818181;
+  
+  --spacing-sm: 0.625rem;
+  --spacing-md: 1.25rem;
+  
+  --radius-sm: 0.5rem;
+  --radius-xl: 1.5rem;
+  
+  --nav-op-size: 0.875rem;
+}
+
+header {
+  width: 100vw;
+  height: 14vh;
+  padding: var(--spacing-sm);
+}
+
+.header-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--night);
+  border-radius: var(--radius-xl);
+}
+
+.menu-btn {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-btn button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3rem;
+  height: 3rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-btn button i {
+  font-size: 2rem;
+  color: var(--bg);
+}
+
+.logo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo a img {
+  width: 3rem;
+  height: 3rem;
+}
+
+.login-btn {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-btn a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 3rem;
+  background-color: var(--btn-green);
+  border-radius: var(--radius-sm);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: var(--nav-op-size);
+  color: var(--night);
+  transition: background-color 0.2s ease;
+}
+
+.login-btn a:hover {
+  background-color: #84BC0D;
+}
+
+.nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 12.5rem;
+  height: 0;
+  z-index: 100;
+  opacity: 0;
+  overflow: hidden;
+  transition: height 0.2s ease, opacity 0.4s ease;
+  background-color: var(--white);
+  border: 1px solid var(--stroke);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.nav ul {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+  height: 100%;
+}
+
+.nav ul li {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  height: calc(100% / 4);
+  border-bottom: 1px solid var(--stroke);
+}
+
+.nav ul li:last-child {
+  border: none;
+}
+
+.nav ul li a {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-left: var(--spacing-md);
+  font-family: 'Poppins', sans-serif;
+  font-size: var(--nav-op-size);
+  transition: background-color 0.2s ease;
+}
+
+.nav ul li a:hover {
+  background-color: var(--bg);
+}
+
+.nav.active {
+  height: 15.625rem;
+  opacity: 1;
+}
+
+@media screen and (min-width: 1024px) {
+  :host {
+    --nav-op-size: 1rem;
+  }
+
+  .menu-btn {
+    display: none;
+  }
+  
+  .nav {
+    position: unset;
+    flex: 3;
+    height: 100%;
+    background: none;
+    border: none;
+    opacity: 1;
+  }
+
+  .nav ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  .nav ul li {
+    flex: 1;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    border: none;
+  }
+
+  .nav ul li a {
+    color: var(--white);
+  }
+
+  .nav ul li a:hover {
+    background-color: transparent;
+    text-decoration: underline;
+  }
+}

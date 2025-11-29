@@ -1,14 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../core/infrastructure/adapters/auth/auth.service';
 
 @Component({
   selector: 'hg-aside',
-  imports: [RouterLink, MatIcon],
+  standalone: true,
+  imports: [RouterLink, MatIcon, CommonModule],
   templateUrl: './aside.component.html',
   styleUrl: './aside.component.css',
 })
 export class AsideComponent {
+  private authService = inject(AuthService);
+  
   isSubnavOpen = false;
 
   toggleSubnav(event: Event): void {
@@ -18,5 +23,11 @@ export class AsideComponent {
 
   closeSubnav(): void {
     this.isSubnavOpen = false;
+  }
+
+  onLogout(): void {
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+      this.authService.logout();
+    }
   }
 }
