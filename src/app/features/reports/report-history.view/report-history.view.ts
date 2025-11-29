@@ -19,7 +19,7 @@ export class ReportHistoryView implements OnInit {
   reports = signal<ReportResponse[]>([]);
   filteredReports = signal<ReportResponse[]>([]);
   paginatedReports = signal<ReportResponse[]>([]);
-  
+
   specimenId = signal<number | null>(null);
   specimenNumber = signal<string>('');
   specimenName = signal<string>('Ejemplar');
@@ -28,14 +28,14 @@ export class ReportHistoryView implements OnInit {
   sortBy = signal<string>('asunto');
   itemsPerPage = signal<number>(10);
   currentPage = signal<number>(1);
-  
+
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
-  
+
   selectedReports = signal<Set<number>>(new Set());
   openMenuId = signal<number | null>(null);
 
-  totalPages = computed(() => 
+  totalPages = computed(() =>
     Math.ceil(this.filteredReports().length / this.itemsPerPage())
   );
 
@@ -46,15 +46,38 @@ export class ReportHistoryView implements OnInit {
     return `${start}-${end} de ${total} items`;
   });
 
+  // --- Navigation Logic ---
+  origin = signal<string>('animals');
+
+  rootLink = computed(() => {
+    return this.origin() === 'removals' ? '/app/animals/removals' : '/app/animals';
+  });
+
+  rootText = computed(() => {
+    return this.origin() === 'removals' ? 'Bajas' : 'Animales';
+  });
+
+  specimenLink = computed(() => {
+    const base = this.origin() === 'removals' ? '/app/removals/details' : '/app/animals/more_info';
+    return [base, this.specimenId()];
+  });
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private reportService: ReportService,
     private location: Location,
     private especimenService: EspecimenService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const origin = params.get('origin');
+      if (origin) {
+        this.origin.set(origin);
+      }
+    });
+
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       if (idParam) {
@@ -70,14 +93,14 @@ export class ReportHistoryView implements OnInit {
 
   private loadSpecimenDetails(id: number): void {
     this.especimenService.getSpecimenById(id).subscribe({
-        next: (details: EspecimenDetalleResponse) => {
-            this.specimenNumber.set(details.numInventario);
-            this.specimenName.set(details.nombreEspecimen);
-        },
-        error: (err) => {
-            console.error('Error al cargar detalles del espécimen', err);
-            this.specimenNumber.set(`#${id}`); 
-        }
+      next: (details: EspecimenDetalleResponse) => {
+        this.specimenNumber.set(details.numInventario);
+        this.specimenName.set(details.nombreEspecimen);
+      },
+      error: (err) => {
+        console.error('Error al cargar detalles del espécimen', err);
+        this.specimenNumber.set(`#${id}`);
+      }
     });
   }
 
@@ -89,11 +112,11 @@ export class ReportHistoryView implements OnInit {
       next: (reports) => {
         this.reports.set(reports);
         this.filteredReports.set(reports);
-        
+
         if (this.specimenNumber() === '') {
-             this.specimenNumber.set(`#${id}`);
+          this.specimenNumber.set(`#${id}`);
         }
-        
+
         this.applyFilters();
         this.loading.set(false);
       },
@@ -141,7 +164,7 @@ export class ReportHistoryView implements OnInit {
 
     const query = this.searchQuery().toLowerCase();
     if (query) {
-      filtered = filtered.filter(report => 
+      filtered = filtered.filter(report =>
         report.asunto.toLowerCase().includes(query) ||
         this.getTipoReporteName(report.tipoReporteId).toLowerCase().includes(query) ||
         report.fechaReporte.includes(query)
@@ -159,7 +182,7 @@ export class ReportHistoryView implements OnInit {
       let valueA: any;
       let valueB: any;
 
-      switch(sortBy) {
+      switch (sortBy) {
         case 'asunto':
           valueA = a.asunto;
           valueB = b.asunto;
@@ -214,7 +237,7 @@ export class ReportHistoryView implements OnInit {
 
   toggleSelectReport(reportId: number): void {
     const selected = new Set(this.selectedReports());
-    
+
     if (selected.has(reportId)) {
       selected.delete(reportId);
     } else {

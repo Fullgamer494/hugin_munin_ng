@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatIcon } from "@angular/material/icon";
@@ -18,17 +18,40 @@ export class ReportDetailView implements OnInit {
   specimenInventory = signal<string | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
-  
+
   reportId: number | null = null;
+
+  // --- Navigation Logic ---
+  origin = signal<string>('animals');
+
+  rootLink = computed(() => {
+    return this.origin() === 'removals' ? '/app/animals/removals' : '/app/animals';
+  });
+
+  rootText = computed(() => {
+    return this.origin() === 'removals' ? 'Bajas' : 'Animales';
+  });
+
+  specimenLink = computed(() => {
+    const base = this.origin() === 'removals' ? '/app/removals/details' : '/app/animals/more_info';
+    return this.report() ? [base, this.report()!.especimenId] : [];
+  });
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private especimenService: EspecimenService,
     private reportService: ReportService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const origin = params.get('origin');
+      if (origin) {
+        this.origin.set(origin);
+      }
+    });
+
     this.route.params.subscribe(params => {
       this.reportId = params['id'] ? +params['id'] : null;
       if (this.reportId) {
@@ -41,7 +64,7 @@ export class ReportDetailView implements OnInit {
 
   private loadReport(): void {
     if (!this.reportId) return;
-    
+
     this.loading.set(true);
     this.error.set(null);
 
@@ -64,15 +87,15 @@ export class ReportDetailView implements OnInit {
   }
 
   private loadSpecimenInventory(especimenId: number): void {
-      this.especimenService.getSpecimenById(especimenId).subscribe({
-          next: (details: EspecimenDetalleResponse) => {
-              this.specimenInventory.set(details.numInventario);
-          },
-          error: (err) => {
-              console.error('Error al cargar el inventario del espécimen', err);
-              this.specimenInventory.set(`#ID:${especimenId} (Error Carga)`);
-          }
-      });
+    this.especimenService.getSpecimenById(especimenId).subscribe({
+      next: (details: EspecimenDetalleResponse) => {
+        this.specimenInventory.set(details.numInventario);
+      },
+      error: (err) => {
+        console.error('Error al cargar el inventario del espécimen', err);
+        this.specimenInventory.set(`#ID:${especimenId} (Error Carga)`);
+      }
+    });
   }
 
   getTipoReporteName(tipoId: number): string {

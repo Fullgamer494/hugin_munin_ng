@@ -2,18 +2,18 @@
   <header class="main-header">
     <div class="page-name">
       <nav class="breadcrumb-nav">
-        <a routerLink="/app/animals">Animales</a>
+        <a [routerLink]="rootLink()">{{ rootText() }}</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a [routerLink]="['/app/animals/more_info', specimenId()]">
+        <a [routerLink]="specimenLink()" [queryParams]="{ origin: origin() }">
           Ejemplar <span>{{ specimenNumber() }}</span>
         </a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a routerLink="./">Historial de reportes</a>
+        <a routerLink="./" [queryParams]="{ origin: origin() }">Historial de reportes</a>
       </nav>
       <h1>Historial de reportes: {{ specimenName() }} ({{ specimenNumber() }})</h1>
     </div>
     <div class="back-btn">
-      <a [routerLink]="['/app/animals/more_info', specimenId()]">
+      <a [routerLink]="specimenLink()" [queryParams]="{ origin: origin() }">
         <mat-icon>arrow_back</mat-icon>
         Regresar
       </a>
@@ -80,10 +80,10 @@
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <div class="actions-menu" [class.show]="isMenuOpen(report.id)">
-                  <a [routerLink]="['/app/reports/detail', report.id]">
+                  <a [routerLink]="['/app/reports/detail', report.id]" [queryParams]="{ origin: origin() }">
                     <mat-icon>visibility</mat-icon> Ver
                   </a>
-                  <a [routerLink]="['/app/reports/edit', report.id]">
+                  <a [routerLink]="['/app/reports/edit', report.id]" [queryParams]="{ origin: origin() }">
                     <mat-icon>edit</mat-icon> Editar
                   </a>
                   <button (click)="deleteReport(report.id)">

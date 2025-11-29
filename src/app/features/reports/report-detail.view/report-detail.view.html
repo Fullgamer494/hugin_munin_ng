@@ -2,22 +2,22 @@
   <header class="main-header">
     <div class="page-name">
       <nav class="breadcrumb-nav">
-        <a routerLink="/app/animals">Animales</a>
+        <a [routerLink]="rootLink()">{{ rootText() }}</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
         @if (report(); as reportData) {
-          <a [routerLink]="['/app/animals/more_info', reportData.especimenId]">
-            Ejemplar <span>{{ specimenInventory() }}</span>
-          </a>
-          
-          <mat-icon>keyboard_arrow_right</mat-icon>
-          
-          <a [routerLink]="['/app/reports/history', reportData.especimenId]">
-            Historial de reportes
-          </a>
-          
-          <mat-icon>keyboard_arrow_right</mat-icon>
-          
-          <a>Reporte <span id="asunto">{{ reportData.asunto }}</span></a>
+        <a [routerLink]="specimenLink()" [queryParams]="{ origin: origin() }">
+          Ejemplar <span>{{ specimenInventory() }}</span>
+        </a>
+
+        <mat-icon>keyboard_arrow_right</mat-icon>
+
+        <a [routerLink]="['/app/reports/history', reportData.especimenId]" [queryParams]="{ origin: origin() }">
+          Historial de reportes
+        </a>
+
+        <mat-icon>keyboard_arrow_right</mat-icon>
+
+        <a>Reporte <span id="asunto">{{ reportData.asunto }}</span></a>
         }
       </nav>
       @if (report()) {
@@ -26,15 +26,15 @@
     </div>
     <div class="back-btn">
       @if (report(); as reportData) {
-        <a [routerLink]="['/app/reports/history', reportData.especimenId]">
-          <mat-icon>arrow_back</mat-icon>
-          Regresar
-        </a>
+      <a [routerLink]="['/app/reports/history', reportData.especimenId]" [queryParams]="{ origin: origin() }">
+        <mat-icon>arrow_back</mat-icon>
+        Regresar
+      </a>
       } @else {
-        <a class="disabled-link">
-          <mat-icon>arrow_back</mat-icon>
-          Regresar
-        </a>
+      <a class="disabled-link">
+        <mat-icon>arrow_back</mat-icon>
+        Regresar
+      </a>
       }
     </div>
   </header>
