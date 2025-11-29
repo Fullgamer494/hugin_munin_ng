@@ -65,3 +65,25 @@ export interface UpdateAltaEspecimenRequest {
     ubicacionDestino: string,
     motivo: string
 }
+
+// Get Especimen Details
+export interface EspecimenDetailsView {
+    id: number;
+    numInventario: string;
+    nombreEspecimen: string;
+    genero: string;
+    especieNombre: string;
+    activo: boolean;
+
+    nombreComun: string; 
+
+    fechaIngreso: string | Date;
+    estadoActual: string;
+
+    origen: string;
+    procedencia: string;
+    observacionesIngreso: string;
+    
+    area: string;
+    ubicacion: string;
+}

@@ -1,1 +1,104 @@
-<p>animal-details.view works!</p>
+<div *ngIf="isLoading" class="loading-state">
+    <p>Cargando detalles del especimen...</p>
+</div>
+
+<div *ngIf="error" class="error-state">
+    <p>Error: {{ error }}</p>
+</div>
+
+<div *ngIf="especimen" class="main-content">
+    <header class="main-header">
+        <div class="page-name">
+            <nav class="breadcrumb-nav">
+                <a routerLink="/app/animals" class="animals">Animales</a>
+                <span><mat-icon>chevron_right</mat-icon></span>
+                <a routerLink="./">Ejemplar <span id="ID_animal">{{ especimen.numInventario }}</span></a>
+            </nav>
+            <h1 id="ID_animal_H1">{{ especimen.nombreEspecimen }}</h1>
+            <h2>
+                <span id="genero">{{ especimen.genero }}</span> 
+                <span id="especie">{{ especimen.especieNombre }}</span>
+            </h2>
+        </div>
+        <div class="back-btn">
+            <a routerLink="/app/animals">
+                <mat-icon>arrow_back</mat-icon> 
+                Regresar
+            </a>
+        </div>
+    </header>
+
+    <div class="animal-details">
+
+        <div class="detail-card">
+            <h3>Información taxonómica</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>science</mat-icon> Género:</span>
+                <span class="value">{{ especimen.genero }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>biotech</mat-icon> Especie:</span>
+                <span class="value">{{ especimen.especieNombre }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>label</mat-icon> Nombre común:</span>
+                <span class="value">{{ especimen.nombreComun }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Identificación y registro</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>inventory</mat-icon> Número de inventario:</span>
+                <span class="value">{{ especimen.numInventario }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>event</mat-icon> Fecha de ingreso:</span>
+                <span class="value">{{ formatDate(especimen.fechaIngreso) }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>check_circle</mat-icon> Estado:</span>
+                <span class="value status-{{ especimen.activo ? 'activo' : 'inactivo' }}">{{ especimen.estadoActual }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Origen y procedencia</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>visibility</mat-icon> Origen:</span>
+                <span class="value">{{ especimen.origen }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>map</mat-icon> Procedencia:</span>
+                <span class="value">{{ especimen.procedencia }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Ubicación actual</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>directions</mat-icon> Área:</span>
+                <span class="value">{{ especimen.area }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label"><mat-icon>pin_drop</mat-icon> Ubicación:</span>
+                <span class="value">{{ especimen.ubicacion }}</span>
+            </div>
+        </div>
+
+        <div class="detail-card">
+            <h3>Historial de reportes</h3>
+            <a routerLink="/reportes/historial/{{ especimen.id }}" class="report-history-btn">
+                <mat-icon>description</mat-icon>
+            </a>
+        </div>
+
+        <div class="detail-card">
+            <h3>Información descriptiva</h3>
+            <div class="detail-row">
+                <span class="label"><mat-icon>border_color</mat-icon> Observaciones de ingreso:</span>
+                <span class="value">{{ especimen.observacionesIngreso }}</span>
+            </div>
+        </div>
+    </div>
+</div>
