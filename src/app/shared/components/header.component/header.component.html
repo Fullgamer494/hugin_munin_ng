@@ -1,6 +1,6 @@
 <div class="header-content">
-    <a routerLink="" class="logo">
-        <img src="images/logo.svg" alt="">
+    <a routerLink="./" class="logo">
+        <img src="assets/logo.svg" alt="">
     </a>
     <div class="user-controls">
         <button>
@@ -9,11 +9,11 @@
 
         <a routerLink="" class="user-info">
             <div class="user-details">
-                <span class="user-name">{{ user_name }}</span>
-                <span class="user-role">{{ user_role }}</span>
+                <span class="user-name">{{ nombreUsuario }}</span>
+                <span class="user-role">{{ rol }}</span>
             </div>
             <div class="user-pic">
-                <img src="{{ user_pic }}" alt="">
+                <img src="{{ urlPic }}" alt="">
             </div>
         </a>
     </div>
