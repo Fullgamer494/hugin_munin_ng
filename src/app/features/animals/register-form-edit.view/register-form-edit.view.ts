@@ -112,40 +112,63 @@ export class RegisterFormEditView implements OnInit, AfterViewInit {
   }
 
   onSubmit(): void {
-    if (this.specimenForm.invalid) {
-      this.specimenForm.markAllAsTouched(); 
-      console.error('Formulario inválido.');
-      return;
-    }
-
-    this.isSaving = true;
-    const rawValue = this.specimenForm.getRawValue(); 
-    
-    const request: UpdateAltaEspecimenRequest = {
-        ...rawValue,
-        fechaIngreso: new Date(rawValue.fechaIngreso) 
-    };
-
-    const alterRequest: AltaEspecimenRequest = {
-      ...rawValue,
-      fechaIngreso: new Date(rawValue.fechaIngreso)
+    if (this.specimenForm.invalid) {
+      this.specimenForm.markAllAsTouched(); 
+      console.error('Formulario inválido.');
+      return;
     }
 
-    const apiCall = this.isEditing && this.specimenId 
-      ? this.especimenService.updateSpecimen(this.specimenId, request) // Asumimos 'updateSpecimen'
-      : this.especimenService.saveSpecimen(alterRequest);
+    this.isSaving = true;
+    const rawValue = this.specimenForm.getRawValue(); 
+    
+    // --- Lógica de Mapeo de Request ---
+    
+    let requestToSend: AltaEspecimenRequest | UpdateAltaEspecimenRequest;
 
-    apiCall.subscribe({
-      next: () => {
-        this.isSaving = false;
-        this.router.navigate(['../']); 
-      },
-      error: (err) => {
-        console.error('Error:', err);
-        this.isSaving = false;
-      }
-    });
-  }
+    if (this.isEditing && this.specimenId) {
+        
+        requestToSend = {
+            nombreEspecimen: rawValue.nombreEspecimen,
+            genero: rawValue.genero,
+            especieNombre: rawValue.especieNombre,
+            
+            // Campos de origen/procedencia/descripción
+            fechaIngreso: new Date(rawValue.fechaIngreso), // Se asume que el backend espera un objeto Date/Timestamp
+            origenAltaId: rawValue.origenAltaId,
+            procedencia: rawValue.procedencia,
+            observacion: rawValue.observacionAlta, // Mapeo: formulario.observacionAlta -> DTO.observacion
+            
+            // Campos de ubicación
+            ubicacionDestino: rawValue.ubicacionDestino,
+            // Motivo no está en el formulario, se asume un valor nulo o fijo si es obligatorio.
+            motivo: 'Actualización de datos', // Asumiendo un valor por defecto, ya que no está en el Form
+        } as UpdateAltaEspecimenRequest;
+
+      
+    } else {
+        // Mapeo al DTO de ALTA (AltaEspecimenRequest)
+        // Este DTO requiere: fechaIngreso como Date y usa observacionAlta.
+        requestToSend = {
+          ...rawValue,
+          fechaIngreso: new Date(rawValue.fechaIngreso) // Convertir a Date
+        } as AltaEspecimenRequest;
+    }
+
+    const apiCall = this.isEditing && this.specimenId 
+      ? this.especimenService.updateSpecimen(this.specimenId, requestToSend as UpdateAltaEspecimenRequest)
+      : this.especimenService.saveSpecimen(requestToSend as AltaEspecimenRequest);
+
+    apiCall.subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.router.navigate(['../']); 
+      },
+      error: (err) => {
+        console.error('Error al guardar:', err);
+        this.isSaving = false;
+      }
+    });
+  }
   
   // Lógica de Interacción Visual (Sin Cambios)
   ngAfterViewInit(): void {
