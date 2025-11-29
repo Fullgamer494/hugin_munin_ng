@@ -4,22 +4,22 @@
   --bg: #FBFBFB;
   --main-green: #84BC0D;
   --btn-green: #A7D14D;
-  
+
   --spacing-xs: 0.5rem;
   --spacing-sm: 0.625rem;
   --spacing-md: 1.25rem;
   --spacing-lg: 1.875rem;
   --spacing-xl: 2.5rem;
-  
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-xl: 1.5rem;
-  
+
+  --radius-sm: 8px;
+  --radius-md: 8px;
+  --radius-xl: 8px;
+
   --p-size: 0.875rem;
   --title-sec-size: 2.25rem;
 }
 
-a{
+a {
   text-decoration: none;
   color: #0C0F0A;
 }
@@ -30,7 +30,7 @@ a{
   align-items: center;
   width: 100vw;
   height: 100vh;
-  padding: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
+  padding: 0 20px 20px 20px;
 }
 
 .hero__text {
@@ -70,7 +70,7 @@ a{
 
 .hero__text .btn-cta {
   width: 90%;
-  padding: var(--spacing-sm);
+  padding: 20px;
   background-color: var(--main-green);
   border-radius: var(--radius-sm);
   text-align: center;
@@ -104,7 +104,7 @@ section {
   align-items: center;
   gap: var(--spacing-xl);
   width: 100vw;
-  padding: var(--spacing-xl) var(--spacing-sm);
+  padding: 20px;
 }
 
 .text {
@@ -113,7 +113,7 @@ section {
   justify-content: start;
   gap: var(--spacing-md);
   width: 100%;
-  padding: 0 var(--spacing-sm);
+  padding: 0 20px;
 }
 
 .text h2 {
@@ -157,7 +157,7 @@ section {
   align-items: center;
   gap: var(--spacing-md);
   width: 100%;
-  padding: 0 var(--spacing-sm);
+  padding: 0 20px;
 }
 
 .function__img {
@@ -184,7 +184,7 @@ section {
 
 .our-team {
   width: 100vw;
-  padding: var(--spacing-sm);
+  padding: 20px;
 }
 
 .our-team h2 {
@@ -197,7 +197,7 @@ section {
 
 .our-team__img {
   width: 100%;
-  padding: var(--spacing-md);
+  padding: 20px;
 }
 
 .our-team__img img {

@@ -5,20 +5,19 @@
   --white: #FFFFFF;
   --btn-green: #A7D14D;
   --stroke: #818181;
-  
+
   --spacing-sm: 0.625rem;
   --spacing-md: 1.25rem;
-  
+
   --radius-sm: 0.5rem;
   --radius-xl: 1.5rem;
-  
+
   --nav-op-size: 0.875rem;
 }
 
 header {
   width: 100vw;
-  height: 14vh;
-  padding: var(--spacing-sm);
+  padding: 20px;
 }
 
 .header-content {
@@ -26,9 +25,9 @@ header {
   display: flex;
   align-items: center;
   width: 100%;
-  height: 100%;
+  height: 8z0px;
   background: var(--night);
-  border-radius: var(--radius-xl);
+  border-radius: 8px;
 }
 
 .menu-btn {
@@ -169,7 +168,7 @@ header {
   .menu-btn {
     display: none;
   }
-  
+
   .nav {
     position: unset;
     flex: 3;

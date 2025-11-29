@@ -3,10 +3,10 @@
   --white: #FFFFFF;
   --stroke: #818181;
   --night: #0C0F0A;
-  
+
   --spacing-sm: 0.625rem;
   --spacing-lg: 1.875rem;
-  
+
   --radius-sm: 0.5rem;
 }
 
@@ -54,6 +54,10 @@
   background-color: var(--white);
   border-radius: var(--radius-sm);
   z-index: 2000;
+}
+
+app-login-form {
+  width: 100%;
 }
 
 .welcome-content {
