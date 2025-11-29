@@ -22,8 +22,13 @@ export const animalRoutes: Routes = [
             .then(m => m.AnimalDetailsView)
     },
     {
-        path: 'deregister/:id',  
+        path: 'deregister/:id',
         loadComponent: () => import('./deregister-form.view/deregister-form.view')
             .then(m => m.DeregisterFormView)
+    },
+    {
+        path: 'deregister/edit/:id',
+        loadComponent: () => import('./deregister-form-edit.view/deregister-form-edit.view')
+            .then(m => m.DeregisterFormEditView)
     }
 ];

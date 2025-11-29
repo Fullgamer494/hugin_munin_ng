@@ -2,31 +2,9 @@ import { Component, AfterViewInit, OnInit, QueryList, ViewChildren, ElementRef, 
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, ActivatedRoute, Router } from "@angular/router";
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-
-interface SpecimenData {
-  id: number;
-  inventoryNumber: string;
-  speciesId: number;
-  genus: string;
-  species: string;
-  commonName: string | null;
-  specimenName: string;
-  sex: string | null;
-  birthDate: string | null;
-  active: boolean;
-  registrationDate: string;
-}
-
-interface DeregistrationRequest {
-  specimenId: number;
-  causeId: number;
-  registeredBy: number;
-  deregistrationDate: string;
-  destination?: string;
-  observations?: string;
-}
+import { EspecimenService } from '../../../api/application/especimen.service';
+import { EspecimenDetalleResponse } from '../../../api/domain/models/especimen-alta.model';
+import { RegistroBajaRequest, CausaBajaResponse } from '../../../api/domain/models/especimen-baja.model';
 
 @Component({
   selector: 'app-deregister-form',
@@ -39,21 +17,21 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   @ViewChildren('toggleBtn') toggleButtons!: QueryList<ElementRef>;
   @ViewChildren('sectionBody') sectionBodies!: QueryList<ElementRef>;
 
-  private http = inject(HttpClient);
+  private especimenService = inject(EspecimenService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private apiUrl = environment.apiUrl;
 
   specimenId: number = 0;
-  specimenData: SpecimenData | null = null;
+  specimenData: EspecimenDetalleResponse | null = null;
   isLoading = true;
   error = '';
+  causasBaja: CausaBajaResponse[] = [];
 
   ngOnInit(): void {
-  
+    this.loadCausasBaja();
     this.route.params.subscribe(params => {
       this.specimenId = Number(params['id']);
-      
+
       if (this.specimenId) {
         this.loadSpecimenData();
       } else {
@@ -68,10 +46,10 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
       if (this.toggleButtons.length > 0) {
         const firstButton = this.toggleButtons.first.nativeElement;
         const firstBody = this.sectionBodies.first.nativeElement;
-        
+
         firstButton.setAttribute('aria-expanded', 'true');
         firstBody.classList.add('initial-open');
-        
+
         const h2 = firstButton.querySelector('h2');
         const icon = firstButton.querySelector('.toggle-icon');
         if (h2) h2.style.color = 'var(--green-font)';
@@ -80,10 +58,21 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     });
   }
 
+  loadCausasBaja(): void {
+    this.especimenService.getAllCausasBaja().subscribe({
+      next: (data) => {
+        this.causasBaja = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar causas de baja:', err);
+      }
+    });
+  }
+
   loadSpecimenData(): void {
     console.log('Cargando datos del animal ID:', this.specimenId);
 
-    this.http.get<SpecimenData>(`${this.apiUrl}/api/specimens/${this.specimenId}`)
+    this.especimenService.getSpecimenById(this.specimenId)
       .subscribe({
         next: (data) => {
           console.log('Datos del animal cargados:', data);
@@ -98,7 +87,7 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
           console.error('Error al cargar datos del animal:', err);
           this.error = 'No se pudo cargar la información del animal';
           this.isLoading = false;
-          
+
           alert('Error: No se pudo cargar la información del animal');
           this.router.navigate(['/animals']);
         }
@@ -112,9 +101,11 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
     const generoInput = document.getElementById('genero') as HTMLInputElement;
     const especieInput = document.getElementById('especie') as HTMLInputElement;
 
-    if (niAnimalInput) niAnimalInput.value = this.specimenData.inventoryNumber;
-    if (generoInput) generoInput.value = this.specimenData.genus;
-    if (especieInput) especieInput.value = this.specimenData.species;
+    if (niAnimalInput) niAnimalInput.value = this.specimenData.numInventario;
+    if (generoInput) generoInput.value = this.specimenData.genero || '';
+    if (especieInput) {
+      especieInput.value = `${this.specimenData.genero} ${this.specimenData.especieNombre}`;
+    }
 
     const fechaBajaInput = document.getElementById('fecha_baja') as HTMLInputElement;
     if (fechaBajaInput) {
@@ -174,104 +165,88 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
   }
 
   onSubmit(event: Event): void {
-  event.preventDefault();
-  
-  if (!this.specimenData) {
-    alert('Error: No se han cargado los datos del animal');
-    return;
-  }
+    event.preventDefault();
 
-  const form = event.target as HTMLFormElement;
-  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
-  const formData = new FormData(form);
-
-  const fechaBaja = formData.get('fecha_baja') as string;
-  if (!fechaBaja) {
-    alert('Por favor selecciona la fecha de baja');
-    return;
-  }
-
-  const causaBaja = parseInt(formData.get('causa_baja') as string);
-  const observaciones = formData.get('observaciones_baja') as string;
-
-  const causasNombres = [
-    '',
-    'Aprovechamiento',
-    'Cambio de depositaría',
-    'Fuga',
-    'Deceso',
-    'Préstamo',
-    'Liberación',
-    'Entrega a PROFEPA'
-  ];
-
-  const confirmed = confirm(
-    `¿Confirmas dar de baja el siguiente animal?\n\n` +
-    `Identificador: ${this.specimenData.inventoryNumber}\n` +
-    `Nombre: ${this.specimenData.specimenName}\n` +
-    `Especie: ${this.specimenData.genus} ${this.specimenData.species}\n\n` +
-    `Causa: ${causasNombres[causaBaja]}\n` +
-    `Fecha: ${fechaBaja}\n\n` +
-    'Esta acción marcará al animal como inactivo y creará un registro de baja.'
-  );
-
-  if (!confirmed) return;
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Procesando...';
-
-  // ✅ CAMPOS CORREGIDOS para coincidir con el backend
-  const deregistrationData: DeregistrationRequest = {
-    specimenId: this.specimenId,        // ✅ CORREGIDO
-    causeId: causaBaja,                 // ✅ CORREGIDO
-    registeredBy: 1,                    // ✅ CORREGIDO
-    deregistrationDate: fechaBaja,      // ✅ CORREGIDO
-    observations: observaciones || undefined // ✅ CORREGIDO
-  };
-
-  console.log('Enviando registro de baja:', deregistrationData);
-
-  this.http.post<{ id: number }>(
-    `${this.apiUrl}/api/deregistrations`,
-    deregistrationData
-  ).subscribe({
-    next: (response) => {
-      console.log('Registro de baja creado con ID:', response.id);
-      
-      alert(
-        `Animal dado de baja exitosamente\n\n` +
-        `Identificador: ${this.specimenData!.inventoryNumber}\n` +
-        `Causa: ${causasNombres[causaBaja]}\n` +
-        `Registro de baja ID: ${response.id}`
-      );
-
-      this.router.navigate(['/animals']);
-    },
-    error: (err) => {
-      console.error('Error al crear registro de baja:', err);
-      console.error('Detalles:', err.error);
-      
-      let errorMessage = 'No se pudo dar de baja el animal';
-      
-      if (err.error?.error) {
-        errorMessage = err.error.error;
-      } else if (err.error?.message) {
-        errorMessage = err.error.message;
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      alert(`Error: ${errorMessage}`);
-      
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Dar de baja';
+    if (!this.specimenData) {
+      alert('Error: No se han cargado los datos del animal');
+      return;
     }
-  });
-}
+
+    const form = event.target as HTMLFormElement;
+    const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+    const formData = new FormData(form);
+
+    const fechaBaja = formData.get('fecha_baja') as string;
+    if (!fechaBaja) {
+      alert('Por favor selecciona la fecha de baja');
+      return;
+    }
+
+    const causaBajaId = parseInt(formData.get('causa_baja') as string);
+    const observaciones = formData.get('observaciones_baja') as string;
+
+    // Find causa name for confirmation
+    const causaNombre = this.causasBaja.find(c => c.id === causaBajaId)?.nombreCausaBaja || 'Desconocida';
+
+    const confirmed = confirm(
+      `¿Confirmas dar de baja el siguiente animal?\n\n` +
+      `Identificador: ${this.specimenData.numInventario}\n` +
+      `Nombre: ${this.specimenData.nombreEspecimen || 'Sin nombre'}\n` +
+      `Especie: ${this.specimenData.genero} ${this.specimenData.especieNombre}\n\n` +
+      `Causa: ${causaNombre}\n` +
+      `Fecha: ${fechaBaja}\n\n` +
+      'Esta acción marcará al animal como inactivo y creará un registro de baja.'
+    );
+
+    if (!confirmed) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Procesando...';
+
+    const deregistrationData: RegistroBajaRequest = {
+      especimenId: this.specimenId,
+      causaBajaId: causaBajaId,
+      responsableId: 1, // Hardcoded for now as in original
+      fechaBaja: fechaBaja,
+      observacion: observaciones || undefined
+    };
+
+    console.log('Enviando registro de baja:', deregistrationData);
+
+    this.especimenService.createRegistroBaja(deregistrationData).subscribe({
+      next: (response) => {
+        console.log('Registro de baja creado con ID:', response.id);
+
+        alert(
+          `Animal dado de baja exitosamente\n\n` +
+          `Identificador: ${this.specimenData!.numInventario}\n` +
+          `Causa: ${causaNombre}\n` +
+          `Registro de baja ID: ${response.id}`
+        );
+
+        this.router.navigate(['/animals']);
+      },
+      error: (err) => {
+        console.error('Error al crear registro de baja:', err);
+
+        let errorMessage = 'No se pudo dar de baja el animal';
+        if (err.error?.message) {
+          errorMessage = err.error.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+
+        alert(`Error: ${errorMessage}`);
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Dar de baja';
+      }
+    });
+  }
 
   onFieldBlur(event: Event): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    
+
     if (field.hasAttribute('required')) {
       if (field.value.trim() === '') {
         field.style.borderColor = '#dc3545';
@@ -283,7 +258,7 @@ export class DeregisterFormView implements AfterViewInit, OnInit {
 
   onFieldInput(event: Event): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    
+
     if (field.hasAttribute('required') && field.value.trim() !== '') {
       field.style.borderColor = '#28a745';
     }
