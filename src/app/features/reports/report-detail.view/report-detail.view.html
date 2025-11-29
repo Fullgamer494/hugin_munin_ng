@@ -4,16 +4,20 @@
       <nav class="breadcrumb-nav">
         <a routerLink="/app/animals">Animales</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        @if (report()) {
-        <a [routerLink]="['/app/animals']">
-          Ejemplar <span>#{{ report()!.especimenId }}</span>
-        </a>
-        <mat-icon>keyboard_arrow_right</mat-icon>
-        <a [routerLink]="['/app/reports/history']" [queryParams]="{ id: report()!.especimenId }">
-          Historial de reportes
-        </a>
-        <mat-icon>keyboard_arrow_right</mat-icon>
-        <a>Reporte <span id="asunto">{{ report()!.asunto }}</span></a>
+        @if (report(); as reportData) {
+          <a [routerLink]="['/app/animals/more_info', reportData.especimenId]">
+            Ejemplar <span>{{ specimenInventory() }}</span>
+          </a>
+          
+          <mat-icon>keyboard_arrow_right</mat-icon>
+          
+          <a [routerLink]="['/app/reports/history', reportData.especimenId]">
+            Historial de reportes
+          </a>
+          
+          <mat-icon>keyboard_arrow_right</mat-icon>
+          
+          <a>Reporte <span id="asunto">{{ reportData.asunto }}</span></a>
         }
       </nav>
       @if (report()) {
@@ -21,10 +25,17 @@
       }
     </div>
     <div class="back-btn">
-      <a (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-        Regresar
-      </a>
+      @if (report(); as reportData) {
+        <a [routerLink]="['/app/reports/history', reportData.especimenId]">
+          <mat-icon>arrow_back</mat-icon>
+          Regresar
+        </a>
+      } @else {
+        <a class="disabled-link">
+          <mat-icon>arrow_back</mat-icon>
+          Regresar
+        </a>
+      }
     </div>
   </header>
 

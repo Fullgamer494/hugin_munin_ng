@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatIcon } from "@angular/material/icon";
 import { ReportService } from '../../../api/infrastructure/services/report.service';
-import { ReportResponse } from '../../../api/domain/models/report.model';
+import { EspecimenDetalleResponse, ReportResponse } from '../../../api/domain/models/report.model';
+import { EspecimenService } from '../../../api/application/especimen.service';
 
 @Component({
   selector: 'app-report-detail-view',
@@ -14,6 +15,7 @@ import { ReportResponse } from '../../../api/domain/models/report.model';
 })
 export class ReportDetailView implements OnInit {
   report = signal<ReportResponse | null>(null);
+  specimenInventory = signal<string | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
   
@@ -22,6 +24,7 @@ export class ReportDetailView implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private especimenService: EspecimenService,
     private reportService: ReportService
   ) {}
 
@@ -46,6 +49,7 @@ export class ReportDetailView implements OnInit {
       next: (report) => {
         if (report) {
           this.report.set(report);
+          this.loadSpecimenInventory(report.especimenId);
         } else {
           this.error.set('Reporte no encontrado');
         }
@@ -57,6 +61,18 @@ export class ReportDetailView implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  private loadSpecimenInventory(especimenId: number): void {
+      this.especimenService.getSpecimenById(especimenId).subscribe({
+          next: (details: EspecimenDetalleResponse) => {
+              this.specimenInventory.set(details.numInventario);
+          },
+          error: (err) => {
+              console.error('Error al cargar el inventario del espécimen', err);
+              this.specimenInventory.set(`#ID:${especimenId} (Error Carga)`);
+          }
+      });
   }
 
   getTipoReporteName(tipoId: number): string {
@@ -72,11 +88,5 @@ export class ReportDetailView implements OnInit {
 
   downloadPDF(): void {
     window.print();
-  }
-
-  goBack(): void {
-    this.router.navigate(['/app/reports/history'], { 
-      queryParams: { id: this.report()?.especimenId } 
-    });
   }
 }

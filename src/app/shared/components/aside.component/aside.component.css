@@ -118,6 +118,8 @@ nav{
     width: 200px;
     height: 200px;
     opacity: 1;
+
+    z-index: 6000;
 }
 
 .subnav-item {

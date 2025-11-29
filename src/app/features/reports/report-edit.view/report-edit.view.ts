@@ -1,11 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { CommonModule, TitleCasePipe, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, Subject } from 'rxjs';
 import { MatIcon } from "@angular/material/icon";
 import { ReportService } from '../../../api/infrastructure/services/report.service';
-import { ReportResponse, EspecimenDetalleResponse } from '../../../api/domain/models/report.model';
+import { EspecimenService } from '../../../api/application/especimen.service';
+import { ReportResponse, EspecimenDetalleResponse, UpdateReportRequest } from '../../../api/domain/models/report.model';
 
 @Component({
   selector: 'app-report-edit',
@@ -14,10 +15,11 @@ import { ReportResponse, EspecimenDetalleResponse } from '../../../api/domain/mo
   templateUrl: './report-edit.view.html',
   styleUrl: './report-edit.view.css'
 })
-export class ReportEditView implements OnInit  {
+export class ReportEditView implements OnInit  {
   reportId = signal<number | null>(null);
   reportType = signal<number>(1);
   reportTypeName = signal<string>('clínico');
+  especimenId = signal<number | null>(null); // Se mantiene para el routerLink en HTML
   
   searchQuery = signal<string>('');
   searchResults = signal<EspecimenDetalleResponse[]>([]);
@@ -36,7 +38,9 @@ export class ReportEditView implements OnInit  {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private especimenService: EspecimenService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +82,9 @@ export class ReportEditView implements OnInit  {
   }
 
   private populateForm(report: ReportResponse): void {
+    // Almacena el ID del espécimen para usarlo en el routerLink del botón "Cancelar"
+    this.especimenId.set(report.especimenId); 
+    
     this.reportType.set(report.tipoReporteId);
     this.setReportTypeName();
     
@@ -85,7 +92,7 @@ export class ReportEditView implements OnInit  {
     this.contenido.set(report.contenido);
     
     if (report.especimenId) {
-      this.reportService.getSpecimenById(report.especimenId).subscribe({
+      this.especimenService.getSpecimenById(report.especimenId).subscribe({
         next: (specimen) => {
           this.selectedSpecimen.set(specimen);
           this.searchQuery.set(this.getSpecimenDisplayText());
@@ -159,6 +166,13 @@ export class ReportEditView implements OnInit  {
     return `${specimen.numInventario} - ${specimen.nombreEspecimen || 'Sin nombre'}`;
   }
 
+  capitalizeFirstLetter(str: string): string {
+    if (str.length === 0) {
+      return "";
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   onSubmit(): void {
     this.error.set(null);
     this.success.set(null);
@@ -181,7 +195,7 @@ export class ReportEditView implements OnInit  {
 
     this.loading.set(true);
 
-    const reportData = {
+    const reportData: UpdateReportRequest = {
       tipoReporteId: this.reportType(),
       asunto: this.asunto(),
       contenido: this.contenido(),
@@ -202,15 +216,6 @@ export class ReportEditView implements OnInit  {
         this.loading.set(false);
       }
     });
-  }
-
-  onCancel(): void {
-    const id = this.reportId();
-    if (id) {
-      this.router.navigate(['/app/reports/detail', id]);
-    } else {
-      this.router.navigate(['/app/dashboard']);
-    }
   }
 
   hideResults(): void {

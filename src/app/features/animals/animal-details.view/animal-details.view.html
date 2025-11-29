@@ -11,7 +11,7 @@
         <div class="page-name">
             <nav class="breadcrumb-nav">
                 <a routerLink="/app/animals" class="animals">Animales</a>
-                <span><mat-icon>chevron_right</mat-icon></span>
+                <mat-icon>chevron_right</mat-icon>
                 <a routerLink="./">Ejemplar <span id="ID_animal">{{ especimen.numInventario }}</span></a>
             </nav>
             <h1 id="ID_animal_H1">{{ especimen.nombreEspecimen }}</h1>
@@ -88,7 +88,7 @@
 
         <div class="detail-card">
             <h3>Historial de reportes</h3>
-            <a routerLink="/reportes/historial/{{ especimen.id }}" class="report-history-btn">
+            <a routerLink="/app/reports/history/{{ especimen.id }}" class="report-history-btn">
                 <mat-icon>description</mat-icon>
             </a>
         </div>

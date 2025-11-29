@@ -97,9 +97,9 @@
         <button type="submit" class="btn btn-submit" [disabled]="loading()">
           {{ loading() ? 'Generando reporte...' : 'Generar reporte' }}
         </button>
-        <button type="button" class="btn-reset" (click)="onCancel()">
+        <a routerLink="/app/dashboard" class="btn-reset">
           Cancelar
-        </button>
+        </a>
       </div>
     </form>
   </div>

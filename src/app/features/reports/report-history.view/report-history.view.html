@@ -4,14 +4,16 @@
       <nav class="breadcrumb-nav">
         <a routerLink="/app/animals">Animales</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a>Ejemplar <span>{{ specimenNumber() }}</span></a>
+        <a [routerLink]="['/app/animals/more_info', specimenId()]">
+          Ejemplar <span>{{ specimenNumber() }}</span>
+        </a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a>Historial de reportes</a>
+        <a routerLink="./">Historial de reportes</a>
       </nav>
-      <h1>Historial de reportes</h1>
+      <h1>Historial de reportes: {{ specimenName() }} ({{ specimenNumber() }})</h1>
     </div>
     <div class="back-btn">
-      <a (click)="goBack()">
+      <a [routerLink]="['/app/animals/more_info', specimenId()]">
         <mat-icon>arrow_back</mat-icon>
         Regresar
       </a>

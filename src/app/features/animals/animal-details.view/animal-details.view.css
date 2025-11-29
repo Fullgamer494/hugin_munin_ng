@@ -32,16 +32,22 @@
 
 .breadcrumb-nav{
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
 
     gap: 5px;
 }
 
 .breadcrumb-nav a{
+    text-decoration: none;
     font-family: 'Montserrat';
     font-size: 14px;
     font-weight: 700;
 
+    color: var(--stroke);
+}
+
+.breadcrumb-nav mat-icon{
     color: var(--stroke);
 }
 
@@ -54,6 +60,10 @@
     font-weight: 700 !important;
 
     color: var(--green-font);
+}
+
+.breadcrumb-nav a #NI_animal{
+    color: var(--stroke);
 }
 
 .page-name h1{
@@ -94,6 +104,7 @@
 
     background-color: #E5E5E5;
     border-radius: clamp(6px, 10px, 12px);
+    color: var(--night);
 
     font-family: 'Poppins';
     font-size: 14px;
@@ -155,7 +166,7 @@
     width: 100%;
 }
 
-.detail-card span i, .detail-card a i{
+.detail-card span mat-icon, .detail-card a mat-icon{
     font-size: 20px;
 
     color: #4F4F4F;
@@ -185,6 +196,7 @@
     width: 100%;
     height: 100px;
 
+    color: var(--night);
     background-color: #E5E5E5;
     border-radius: clamp(6px, 10px, 12px);
 }

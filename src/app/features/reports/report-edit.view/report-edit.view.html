@@ -2,11 +2,11 @@
   <header class="main-header">
     <div class="page-name">
       <nav class="breadcrumb-nav">
-        <a [routerLink]="['/app/dashboard']">Dashboard</a>
+        <a [routerLink]="['/app/dashboard']">{{ capitalizeFirstLetter(reportTypeName()) }}</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
         <a routerLink="./">Editar reporte {{ reportTypeName() }}</a>
       </nav>
-      <h1>Editar reporte {{ reportTypeName() }}</h1>
+      <h1>Editar reporte {{ reportTypeName() | titlecase }}</h1>
     </div>
   </header>
 
@@ -27,40 +27,21 @@
   }
 
   @if (!loading()) {
+  
   <div class="search-container">
     <div class="search">
       <label for="search"><mat-icon>search</mat-icon></label>
       <input type="text" class="search-input" id="search" placeholder="Buscar por número de inventario PLXXX, MXXX"
-        [value]="searchQuery()" (input)="onSearchInput($event)" (blur)="hideResults()">
+        [value]="searchQuery()" [disabled]="true"> 
     </div>
-
-    @if (showResults()) {
-    <div class="search-results">
-      @if (searchResults().length === 0) {
-      <div class="search-result-item no-results">No se encontraron especímenes</div>
-      } @else {
-      @for (specimen of searchResults(); track specimen.id) {
-      <div class="search-result-item" (click)="selectSpecimen(specimen)">
-        <div class="specimen-info">
-          <strong>{{ specimen.numInventario }}</strong>
-          <span class="specimen-name">- {{ specimen.nombreEspecimen || 'Sin nombre' }} -</span>
-          <i [class]="specimen.activo ? 'active' : 'inactive'">
-            {{ specimen.activo ? 'Activo' : 'Inactivo' }}
-          </i>
-        </div>
-      </div>
-      }
-      }
-    </div>
-    }
   </div>
 
-  @if (selectedSpecimen()) {
+  @if (selectedSpecimen(); as specimen) {
   <div class="selected-specimen">
-    <h4>Espécimen seleccionado:</h4>
-    <p><strong>Número de inventario:</strong> {{ selectedSpecimen()!.numInventario }}</p>
-    <p><strong>Nombre:</strong> {{ selectedSpecimen()!.nombreEspecimen || 'Sin nombre' }}</p>
-    <p><strong>Estado:</strong> {{ selectedSpecimen()!.activo ? 'Activo' : 'Inactivo' }}</p>
+    <h4>Espécimen asociado:</h4>
+    <p><strong>Número de inventario:</strong> {{ specimen.numInventario }}</p>
+    <p><strong>Nombre:</strong> {{ specimen.nombreEspecimen || 'Sin nombre' }}</p>
+    <p><strong>Estado:</strong> {{ specimen.activo ? 'Activo' : 'Inactivo' }}</p>
   </div>
   }
 
@@ -82,9 +63,16 @@
         <button type="submit" class="btn btn-submit" [disabled]="loading()">
           {{ loading() ? 'Actualizando reporte' : 'Actualizar reporte' }}
         </button>
-        <button type="button" class="btn-reset" (click)="onCancel()">
-          Cancelar
-        </button>
+        
+        @if (especimenId(); as id) {
+          <a [routerLink]="['/app/reports/history', id]" class="btn-reset">
+            Cancelar
+          </a>
+        } @else {
+           <a [routerLink]="['/app/dashboard']" class="btn-reset">
+            Cancelar
+          </a>
+        }
       </div>
     </form>
   </div>

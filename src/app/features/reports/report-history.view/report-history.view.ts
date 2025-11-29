@@ -1,10 +1,12 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from "@angular/material/icon";
 import { ReportService } from '../../../api/infrastructure/services/report.service';
 import { ReportResponse } from '../../../api/domain/models/report.model';
+import { EspecimenService } from '../../../api/application/especimen.service';
+import { EspecimenDetalleResponse } from '../../../api/domain/models/report.model';
 
 @Component({
   selector: 'app-report-history',
@@ -20,7 +22,8 @@ export class ReportHistoryView implements OnInit {
   
   specimenId = signal<number | null>(null);
   specimenNumber = signal<string>('');
-  
+  specimenName = signal<string>('Ejemplar');
+
   searchQuery = signal<string>('');
   sortBy = signal<string>('asunto');
   itemsPerPage = signal<number>(10);
@@ -46,25 +49,39 @@ export class ReportHistoryView implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private location: Location,
+    private especimenService: EspecimenService
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const id = params['id'];
-      if (id) {
-        this.specimenId.set(+id);
-        this.loadReports();
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (idParam) {
+        const id = +idParam;
+        this.specimenId.set(id);
+        this.loadSpecimenDetails(id);
+        this.loadReports(id);
       } else {
-        this.error.set('No se especificó un ID de espécimen válido');
+        this.error.set('No se especificó un ID de espécimen válido en la ruta.');
       }
     });
   }
 
-  private loadReports(): void {
-    const id = this.specimenId();
-    if (!id) return;
+  private loadSpecimenDetails(id: number): void {
+    this.especimenService.getSpecimenById(id).subscribe({
+        next: (details: EspecimenDetalleResponse) => {
+            this.specimenNumber.set(details.numInventario);
+            this.specimenName.set(details.nombreEspecimen);
+        },
+        error: (err) => {
+            console.error('Error al cargar detalles del espécimen', err);
+            this.specimenNumber.set(`#${id}`); 
+        }
+    });
+  }
 
+  private loadReports(id: number): void {
     this.loading.set(true);
     this.error.set(null);
 
@@ -73,8 +90,8 @@ export class ReportHistoryView implements OnInit {
         this.reports.set(reports);
         this.filteredReports.set(reports);
         
-        if (reports.length > 0) {
-          this.specimenNumber.set(`#${reports[0].especimenId}`);
+        if (this.specimenNumber() === '') {
+             this.specimenNumber.set(`#${id}`);
         }
         
         this.applyFilters();
@@ -247,7 +264,7 @@ export class ReportHistoryView implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/app/animals']);
+    this.location.back();
   }
 
   getPageNumbers(): number[] {
