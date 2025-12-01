@@ -3,11 +3,11 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, Subject } from 'rxjs';
-import { CreateReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
-import { SearchSpecimensUseCase } from '../../../core/domain/ports/inbound/report/specimen.use-case';
-import { Specimen } from '../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
 import { MatIcon } from "@angular/material/icon";
+
+import { ReportService } from '../../../api/infrastructure/services/report.service';
+import { LoginService } from '../../../api/application/login.service';
+import { EspecimenDetalleResponse } from '../../../api/domain/models/report.model';
 
 @Component({
   selector: 'app-report-form',
@@ -21,9 +21,9 @@ export class ReportFormView implements OnInit {
   reportTypeName = signal<string>('clínico');
   
   searchQuery = signal<string>('');
-  searchResults = signal<Specimen[]>([]);
+  searchResults = signal<EspecimenDetalleResponse[]>([]);
   showResults = signal<boolean>(false);
-  selectedSpecimen = signal<Specimen | null>(null);
+  selectedSpecimen = signal<EspecimenDetalleResponse | null>(null);
   
   asunto = signal<string>('');
   contenido = signal<string>('');
@@ -37,9 +37,8 @@ export class ReportFormView implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private createReportUseCase: CreateReportUseCase,
-    private searchSpecimensUseCase: SearchSpecimensUseCase,
-    private authService: AuthService
+    private reportService: ReportService,
+    private loginService: LoginService
   ) {}
 
   ngOnInit(): void {
@@ -92,7 +91,7 @@ export class ReportFormView implements OnInit {
   }
 
   private searchSpecimens(query: string): void {
-    this.searchSpecimensUseCase.execute(query).subscribe({
+    this.reportService.searchSpecimens(query).subscribe({
       next: (specimens) => {
         this.searchResults.set(specimens);
         this.showResults.set(true);
@@ -104,7 +103,7 @@ export class ReportFormView implements OnInit {
     });
   }
 
-  selectSpecimen(specimen: Specimen): void {
+  selectSpecimen(specimen: EspecimenDetalleResponse): void {
     this.selectedSpecimen.set(specimen);
     this.searchQuery.set(this.getSpecimenDisplayText());
     this.showResults.set(false);
@@ -113,7 +112,7 @@ export class ReportFormView implements OnInit {
   private getSpecimenDisplayText(): string {
     const specimen = this.selectedSpecimen();
     if (!specimen) return '';
-    return `${specimen.num_inventario} - ${specimen.nombre_especimen || 'Sin nombre'}`;
+    return `${specimen.numInventario} - ${specimen.nombreEspecimen || 'Sin nombre'}`;
   }
 
   onSubmit(): void {
@@ -135,7 +134,7 @@ export class ReportFormView implements OnInit {
       return;
     }
 
-    const userId = this.authService.getCurrentUserId();
+    const userId = this.loginService.getCurrentUserId();
     if (!userId) {
       this.error.set('Usuario no autenticado');
       return;
@@ -144,15 +143,15 @@ export class ReportFormView implements OnInit {
     this.loading.set(true);
 
     const reportData = {
-      id_tipo_reporte: this.reportType(),
-      id_especimen: this.selectedSpecimen()!.id_especimen,
-      id_responsable: userId,
+      tipoReporteId: this.reportType(),
+      especimenId: this.selectedSpecimen()!.id,
+      responsableId: userId,
       asunto: this.asunto(),
       contenido: this.contenido(),
-      fecha_reporte: new Date().toISOString().split('T')[0]
+      fechaReporte: new Date().toISOString().split('T')[0]
     };
 
-    this.createReportUseCase.execute(reportData).subscribe({
+    this.reportService.createReport(reportData).subscribe({
       next: () => {
         this.success.set('Reporte creado exitosamente');
         this.loading.set(false);
@@ -177,7 +176,7 @@ export class ReportFormView implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/app/dashboard']);
   }
 
   hideResults(): void {

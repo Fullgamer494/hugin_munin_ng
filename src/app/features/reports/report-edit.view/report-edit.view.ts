@@ -1,14 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { CommonModule, TitleCasePipe, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, Subject } from 'rxjs';
-import { GetReportByIdUseCase, UpdateReportUseCase } from '../../../core/domain/ports/inbound/report/report.use-case';
-import { SearchSpecimensUseCase } from '../../../core/domain/ports/inbound/report/specimen.use-case';
-import { ReportEntity } from '../../../core/domain/entities/report/report.entity';
-import { Specimen } from '../../../core/domain/entities/report/report.entity';
-import { AuthService } from '../../../infrastructure/adapters/auth/auth.service';
 import { MatIcon } from "@angular/material/icon";
+import { ReportService } from '../../../api/infrastructure/services/report.service';
+import { EspecimenService } from '../../../api/application/especimen.service';
+import { ReportResponse, EspecimenDetalleResponse, UpdateReportRequest } from '../../../api/domain/models/report.model';
 
 @Component({
   selector: 'app-report-edit',
@@ -17,15 +15,16 @@ import { MatIcon } from "@angular/material/icon";
   templateUrl: './report-edit.view.html',
   styleUrl: './report-edit.view.css'
 })
-export class ReportEditView implements OnInit  {
+export class ReportEditView implements OnInit  {
   reportId = signal<number | null>(null);
   reportType = signal<number>(1);
   reportTypeName = signal<string>('clínico');
+  especimenId = signal<number | null>(null); // Se mantiene para el routerLink en HTML
   
   searchQuery = signal<string>('');
-  searchResults = signal<Specimen[]>([]);
+  searchResults = signal<EspecimenDetalleResponse[]>([]);
   showResults = signal<boolean>(false);
-  selectedSpecimen = signal<Specimen | null>(null);
+  selectedSpecimen = signal<EspecimenDetalleResponse | null>(null);
   
   asunto = signal<string>('');
   contenido = signal<string>('');
@@ -39,10 +38,9 @@ export class ReportEditView implements OnInit  {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private getReportByIdUseCase: GetReportByIdUseCase,
-    private updateReportUseCase: UpdateReportUseCase,
-    private searchSpecimensUseCase: SearchSpecimensUseCase,
-    private authService: AuthService
+    private reportService: ReportService,
+    private especimenService: EspecimenService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -66,7 +64,7 @@ export class ReportEditView implements OnInit  {
     this.loading.set(true);
     this.error.set(null);
 
-    this.getReportByIdUseCase.execute(id).subscribe({
+    this.reportService.getReportById(id).subscribe({
       next: (report) => {
         if (report) {
           this.populateForm(report);
@@ -83,16 +81,24 @@ export class ReportEditView implements OnInit  {
     });
   }
 
-  private populateForm(report: ReportEntity): void {
-    this.reportType.set(report.id_tipo_reporte);
+  private populateForm(report: ReportResponse): void {
+    // Almacena el ID del espécimen para usarlo en el routerLink del botón "Cancelar"
+    this.especimenId.set(report.especimenId); 
+    
+    this.reportType.set(report.tipoReporteId);
     this.setReportTypeName();
     
     this.asunto.set(report.asunto);
     this.contenido.set(report.contenido);
     
-    if (report.especimen) {
-      this.selectedSpecimen.set(report.especimen);
-      this.searchQuery.set(this.getSpecimenDisplayText());
+    if (report.especimenId) {
+      this.especimenService.getSpecimenById(report.especimenId).subscribe({
+        next: (specimen) => {
+          this.selectedSpecimen.set(specimen);
+          this.searchQuery.set(this.getSpecimenDisplayText());
+        },
+        error: (err) => console.error('Error al cargar espécimen:', err)
+      });
     }
   }
 
@@ -136,7 +142,7 @@ export class ReportEditView implements OnInit  {
   }
 
   private searchSpecimens(query: string): void {
-    this.searchSpecimensUseCase.execute(query).subscribe({
+    this.reportService.searchSpecimens(query).subscribe({
       next: (specimens) => {
         this.searchResults.set(specimens);
         this.showResults.set(true);
@@ -148,7 +154,7 @@ export class ReportEditView implements OnInit  {
     });
   }
 
-  selectSpecimen(specimen: Specimen): void {
+  selectSpecimen(specimen: EspecimenDetalleResponse): void {
     this.selectedSpecimen.set(specimen);
     this.searchQuery.set(this.getSpecimenDisplayText());
     this.showResults.set(false);
@@ -157,7 +163,14 @@ export class ReportEditView implements OnInit  {
   private getSpecimenDisplayText(): string {
     const specimen = this.selectedSpecimen();
     if (!specimen) return '';
-    return `${specimen.num_inventario} - ${specimen.nombre_especimen || 'Sin nombre'}`;
+    return `${specimen.numInventario} - ${specimen.nombreEspecimen || 'Sin nombre'}`;
+  }
+
+  capitalizeFirstLetter(str: string): string {
+    if (str.length === 0) {
+      return "";
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   onSubmit(): void {
@@ -167,11 +180,6 @@ export class ReportEditView implements OnInit  {
     const id = this.reportId();
     if (!id) {
       this.error.set('ID de reporte no válido');
-      return;
-    }
-
-    if (!this.selectedSpecimen()) {
-      this.error.set('Debe seleccionar un espécimen');
       return;
     }
 
@@ -185,29 +193,21 @@ export class ReportEditView implements OnInit  {
       return;
     }
 
-    const userId = this.authService.getCurrentUserId();
-    if (!userId) {
-      this.error.set('Usuario no autenticado');
-      return;
-    }
-
     this.loading.set(true);
 
-    const reportData = {
-      id_tipo_reporte: this.reportType(),
-      id_especimen: this.selectedSpecimen()!.id_especimen,
-      id_responsable: userId,
+    const reportData: UpdateReportRequest = {
+      tipoReporteId: this.reportType(),
       asunto: this.asunto(),
       contenido: this.contenido(),
-      fecha_reporte: new Date().toISOString().split('T')[0]
+      fechaReporte: new Date().toISOString().split('T')[0]
     };
 
-    this.updateReportUseCase.execute(id, reportData).subscribe({
+    this.reportService.updateReport(id, reportData).subscribe({
       next: () => {
         this.success.set('Reporte actualizado exitosamente');
         this.loading.set(false);
         setTimeout(() => {
-          this.router.navigate(['/detail', id]);
+          this.router.navigate(['/app/reports/detail', id]);
         }, 2000);
       },
       error: (err) => {
@@ -216,15 +216,6 @@ export class ReportEditView implements OnInit  {
         this.loading.set(false);
       }
     });
-  }
-
-  onCancel(): void {
-    const id = this.reportId();
-    if (id) {
-      this.router.navigate(['/detail', id]);
-    } else {
-      this.router.navigate(['/']);
-    }
   }
 
   hideResults(): void {

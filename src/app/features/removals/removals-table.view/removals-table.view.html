@@ -13,20 +13,12 @@
             <label for="searchInput">
                 <mat-icon>search</mat-icon>
             </label>
-            <input 
-                type="text" 
-                class="search-input" 
-                id="searchInput" 
-                placeholder="Buscar..."
-                (input)="onSearch($event)">
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar..." (input)="onSearch($event)">
         </div>
         <div class="filters">
             <div class="filter-group">
                 <label for="sortSelect">Ordenar por</label>
-                <select 
-                    class="filter-select" 
-                    id="sortSelect"
-                    (change)="onSortChange($event)">
+                <select class="filter-select" id="sortSelect" (change)="onSortChange($event)">
                     <option value="identificador">Identificador</option>
                     <option value="genero">Género</option>
                     <option value="especie">Especie</option>
@@ -52,37 +44,43 @@
                     </tr>
                 </thead>
                 <tbody id="mammalsTableBody">
-                    <!-- Filas con datos -->
-                    <tr *ngFor="let animal of getPaginatedAnimals()">
-                        <td>{{ animal.inventoryNumber }}</td>
-                        <td>{{ animal.genus }}</td>
-                        <td>{{ animal.species }}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>{{ animal.deregistrationDate }}</td>
-                        <td class="actions-cell">
-                            <button class="actions-btn" (click)="toggleMenu($event)">
-                                <mat-icon>more_vert</mat-icon>
-                            </button>
-                            <div class="actions-menu">
-                                <button (click)="viewDetails(animal.specimenId)">
-                                    <mat-icon>visibility</mat-icon>
-                                    <span>Ver detalles</span>
-                                </button>
-                                <button (click)="viewReport(animal.id)">
-                                    <mat-icon>description</mat-icon>
-                                    <span>Ver reporte</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <ng-container *ngIf="animalesFiltrados$ | async as animales">
+                        <tr *ngFor="let animal of animales">
+                            <td>{{ animal.numInventario }}</td>
+                            <td>{{ animal.genero }}</td>
+                            <td>{{ animal.especieNombre }}</td>
+                            <td>{{ animal.origen }}</td>
+                            <td>{{ animal.procedencia }}</td>
+                            <td>{{ animal.fechaIngreso | date:'dd/MM/yyyy' }}</td>
+                            <td>{{ animal.fechaBaja | date:'dd/MM/yyyy' }}</td>
 
-                    <tr *ngIf="animalesFiltrados.length === 0 && !isLoading">
-                        <td colspan="8" style="text-align: center; padding: 20px;">
-                            No se encontraron animales dados de baja
-                        </td>
-                    </tr>
+                            <td class="actions-cell">
+                                <button class="actions-btn" (click)="toggleMenu(animal.id)">
+                                    <mat-icon>more_vert</mat-icon>
+                                </button>
+                                <div class="actions-menu" [class.visible]="menuAbiertoId === animal.id">
+                                    <button (click)="viewDetails(animal.especimenId)">
+                                        <mat-icon>visibility</mat-icon>
+                                        <span>Ver detalles</span>
+                                    </button>
+                                    <button (click)="editDeregistration(animal.especimenId)">
+                                        <mat-icon>edit</mat-icon>
+                                        <span>Editar</span>
+                                    </button>
+                                    <button (click)="viewReport(animal.especimenId)">
+                                        <mat-icon>description</mat-icon>
+                                        <span>Ver reporte</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr *ngIf="animales.length === 0 && !isLoading">
+                            <td colspan="8" style="text-align: center; padding: 20px;">
+                                No se encontraron animales dados de baja
+                            </td>
+                        </tr>
+                    </ng-container>
 
                     <tr *ngIf="isLoading">
                         <td colspan="8" style="text-align: center; padding: 20px;">
@@ -102,40 +100,25 @@
         <div class="pagination">
             <div class="pagination-info">
                 <span id="paginationInfo">{{ getPaginationInfo() }}</span>
-                <select 
-                    class="pagination-filter-select" 
-                    id="itemsPerPage"
-                    (change)="onItemsPerPageChange($event)">
+                <select class="pagination-filter-select" id="itemsPerPage" (change)="onItemsPerPageChange($event)">
                     <option value="10">10 por página</option>
                     <option value="25">25 por página</option>
                     <option value="50">50 por página</option>
                     <option value="100">100 por página</option>
                 </select>
             </div>
-            
+
             <div class="pagination-controls">
-                <button 
-                    class="page-btn" 
-                    id="prevBtn" 
-                    [disabled]="currentPage === 0"
-                    (click)="previousPage()">
+                <button class="page-btn" id="prevBtn" [disabled]="currentPage === 0" (click)="previousPage()">
                     <mat-icon>keyboard_arrow_left</mat-icon>
                 </button>
 
-                <button 
-                    *ngFor="let page of getVisiblePages()"
-                    class="page-btn"
-                    [class.active]="page === currentPage"
-                    [attr.data-page]="page + 1"
-                    (click)="goToPage(page)">
-                    {{ page + 1 }}
+                <button *ngFor="let page of [].constructor(totalPages > 0 ? totalPages : 1); let i = index"
+                    class="page-btn" [class.active]="i === currentPage" [attr.data-page]="i + 1" (click)="goToPage(i)">
+                    {{ i + 1 }}
                 </button>
 
-                <button 
-                    class="page-btn" 
-                    id="nextBtn"
-                    [disabled]="currentPage >= totalPages - 1"
-                    (click)="nextPage()">
+                <button class="page-btn" id="nextBtn" [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">
                     <mat-icon>keyboard_arrow_right</mat-icon>
                 </button>
             </div>

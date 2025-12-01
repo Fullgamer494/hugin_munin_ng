@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../api/application/auth.service';
+import { UserInfoResponse } from '../../../api/domain/models/user.model';
 
 @Component({
   selector: 'hg-header',
@@ -9,7 +11,18 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.component.css',
 })
 export class HeaderComponent {
-  user_name = 'Gilberto Málaga';
-  user_role = 'Admin general'
-  user_pic = 'https://picsum.photos/200'
+  nombreUsuario!: string
+  rol!: string
+  urlPic: string = 'https://picsum.photos/200'
+
+  constructor(private auth: AuthService) {}
+
+  ngOnInit(): void{
+    this.auth.getCurrentUser().subscribe(data=> {
+      this.nombreUsuario = data.nombreUsuario
+      this.rol = data.rol
+    }
+    )
+  }
+
 }

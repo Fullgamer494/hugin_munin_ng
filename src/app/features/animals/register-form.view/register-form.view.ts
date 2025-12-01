@@ -1,39 +1,105 @@
-import { Component, AfterViewInit, QueryList, ViewChildren, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, OnInit, QueryList, ViewChildren, ElementRef, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink, Router } from "@angular/router";
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { switchMap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
-import { CreateEspecieUseCase } from '../../../features/animals/register-form.view/register.case';
-import { CreateRegistroAltaUseCase } from '../../../features/animals/register-form.view/register.case';
-import { EspecieRequest, RegistroAltaRequest } from '../../../features/animals/register-form.view/register.model';
+// Módulos Reactivos
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms'; 
 
-interface SpecimenRequest {
-  inventoryNumber: string;
-  speciesId: number;
-  specimenName: string;
-  sex: string | null;
-  birthDate: string | null;
-}
+// Importa tu servicio y modelo de Dominio (rutas asumidas)
+import { EspecimenService } from '../../../api/application/especimen.service'; 
+import { AltaEspecimenRequest } from '../../../api/domain/models/especimen-alta.model'; 
+
 
 @Component({
   selector: 'app-register-form.view',
   standalone: true,
-  imports: [RouterLink, MatIcon, CommonModule],
+  // Importaciones necesarias: RouterLink, MatIcon, CommonModule, ReactiveFormsModule
+  imports: [RouterLink, MatIcon, CommonModule, ReactiveFormsModule], 
   templateUrl: './register-form.view.html',
   styleUrl: './register-form.view.css',
 })
-export class RegisterFormView implements AfterViewInit {
+export class RegisterFormView implements OnInit, AfterViewInit {
+  // Inyección de dependencias
+  private fb = inject(FormBuilder);
+  private especimenService = inject(EspecimenService);
+  private router = inject(Router);
+
+  // Propiedades de estado y formulario
+  specimenForm!: FormGroup;
+  isSaving: boolean = false; 
+
+  // Referencias a elementos del DOM (Para la funcionalidad de despliegue)
   @ViewChildren('toggleBtn') toggleButtons!: QueryList<ElementRef>;
   @ViewChildren('sectionBody') sectionBodies!: QueryList<ElementRef>;
 
-  private createEspecieUseCase = inject(CreateEspecieUseCase);
-  private createRegistroAltaUseCase = inject(CreateRegistroAltaUseCase);
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private apiUrl = environment.apiUrl;
+  ngOnInit(): void {
+    // Inicialización del FormGroup con todos los campos del DTO
+    this.specimenForm = this.fb.group({
+      // Identificación
+      numInventario: ['', Validators.required],
+      nombreEspecimen: [''],
+      // Formato: ['valor inicial', [validadores]]
+      fechaIngreso: ['', Validators.required], 
 
+      // Clasificación Taxonómica
+      genero: ['', Validators.required],
+      especieNombre: ['', Validators.required],
+      
+      // Información de Procedencia
+      origenAltaId: [null, Validators.required], 
+      procedencia: ['', Validators.required],
+      observacionAlta: [''], // El campo de observaciones
+      
+      // Ubicación Actual
+      // areaOrigen: Deshabilitado y con valor por defecto "Externo"
+      areaOrigen: [{ value: 'Externo', disabled: true }, Validators.required], 
+      areaDestino: ['', Validators.required],
+      ubicacionOrigen: ['', Validators.required],
+      ubicacionDestino: ['', Validators.required],
+
+      // Responsable (Asignar ID del usuario logueado, aquí asumimos '1')
+      responsableId: [1, Validators.required], 
+    });
+  }
+
+  // --- Lógica del Formulario y Conexión al Backend ---
+
+  onSubmit(): void {
+    if (this.specimenForm.invalid) {
+      this.specimenForm.markAllAsTouched(); 
+      console.error('Formulario inválido. Revise los campos requeridos.');
+      return;
+    }
+
+    this.isSaving = true;
+    
+    // 1. Obtener todos los valores, incluyendo el campo deshabilitado 'areaOrigen'
+    const rawValue = this.specimenForm.getRawValue(); 
+    
+    // 2. Castear la fecha string del input (YYYY-MM-DD) a objeto Date para el Adaptador
+    const altaRequest: AltaEspecimenRequest = {
+        ...rawValue,
+        // Convertir la cadena de fecha del formulario a un objeto Date
+        fechaIngreso: new Date(rawValue.fechaIngreso) 
+    };
+
+    // 3. Llama al Caso de Uso y se suscribe
+    this.especimenService.saveSpecimen(altaRequest).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        this.router.navigate(['../']); 
+      },
+      error: (err) => {
+        console.error('Error al guardar:', err);
+        this.isSaving = false;
+        // Aquí puedes mostrar una notificación de error al usuario
+      }
+    });
+  }
+  
+  // --- Lógica de Interacción Visual Recuperada ---
+  
+  // Lógica de apertura de la primera sección al cargar la vista
   ngAfterViewInit(): void {
     setTimeout(() => {
       if (this.toggleButtons.length > 0) {
@@ -51,6 +117,7 @@ export class RegisterFormView implements AfterViewInit {
     });
   }
 
+  // Función para desplegar/contraer secciones con transición CSS
   toggleSection(event: Event, index: number): void {
     const button = event.currentTarget as HTMLElement;
     const targetBody = this.sectionBodies.toArray()[index].nativeElement;
@@ -62,6 +129,7 @@ export class RegisterFormView implements AfterViewInit {
     const icon = button.querySelector('.toggle-icon') as HTMLElement;
 
     if (!isExpanded) {
+      // Abrir la sección
       targetBody.classList.remove('initial-open');
       targetBody.style.display = 'flex';
       targetBody.style.maxHeight = '0px';
@@ -83,6 +151,7 @@ export class RegisterFormView implements AfterViewInit {
       }, 400);
 
     } else {
+      // Cerrar la sección
       targetBody.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
       targetBody.style.maxHeight = targetBody.scrollHeight + 'px';
 
@@ -102,120 +171,28 @@ export class RegisterFormView implements AfterViewInit {
     }
   }
 
-  onSubmit(event: Event): void {
-    event.preventDefault();
-    
-    const form = event.target as HTMLFormElement;
-    const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
-    const formData = new FormData(form);
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Enviando...';
-
-    console.log('INICIANDO PROCESO DE REGISTRO');
-
-    const especieData: EspecieRequest = {
-      genero: formData.get('genero') as string,
-      especie: formData.get('especie') as string,
-      nombreComun: null
-    };
-
-    console.log('Creando especie:', especieData);
-
-    this.createEspecieUseCase.execute(especieData).pipe(
-      switchMap((especieResponse) => {
-        console.log('Especie creada con ID:', especieResponse.id);
-
-        const specimenData: SpecimenRequest = {
-          inventoryNumber: formData.get('NI_animal') as string,
-          speciesId: especieResponse.id,
-          specimenName: formData.get('nombre_especimen') as string || 'Sin nombre',
-          sex: null,
-          birthDate: null
-        };
-
-        console.log('Creando specimen:', specimenData);
-
-        return this.http.post<{ id: number }>(
-          `${this.apiUrl}/api/specimens`,
-          specimenData
-        );
-      }),
-      switchMap((specimenResponse) => {
-        console.log('Specimen creado con ID:', specimenResponse.id);
-
-        const registrationData: RegistroAltaRequest = {
-          idEspecimen: specimenResponse.id,
-          idOrigenAlta: parseInt(formData.get('id_origen') as string),
-          idResponsable: 1, 
-          fechaIngreso: formData.get('fecha_ingreso') as string,
-          procedencia: formData.get('procedencia') as string || undefined,
-          observacion: formData.get('observaciones_ingreso') as string || undefined
-        };
-
-        console.log('3️Creando registro de alta:', registrationData);
-
-        return this.createRegistroAltaUseCase.execute(registrationData);
-      })
-    ).subscribe({
-      next: (registrationResponse) => {
-        console.log('REGISTRO COMPLETADO ID:', registrationResponse.id);
-        console.log('PROCESO FINALIZADO CON ÉXITO');
-        
-        alert('¡Registro creado exitosamente!');
-        form.reset();
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Agregar';
-        
-        setTimeout(() => {
-          this.router.navigate(['/animals']);
-        }, 1000);
-      },
-      error: (error) => {
-        console.error('ERROR EN EL PROCESO');
-        console.error('Error completo:', error);
-        console.error('Status:', error.status);
-        console.error('Mensaje:', error.message);
-        console.error('Error del servidor:', error.error);
-        
-        let errorMessage = 'No se pudo completar el registro';
-        
-        if (error.error?.error) {
-          errorMessage = error.error.error;
-        } else if (error.error?.message) {
-          errorMessage = error.error.message;
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
-        
-        if (errorMessage.includes('already has a registration')) {
-          errorMessage = 'Este ejemplar ya tiene un registro de alta';
-        }
-        
-        alert(`Error: ${errorMessage}`);
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Agregar';
-      }
-    });
-  }
-
+  // Lógica manual de color de borde para simular validación (se puede mejorar con Angular)
   onFieldBlur(event: any): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    
-    if (field.hasAttribute('required')) {
-      if (field.value.trim() === '') {
-        field.style.borderColor = '#dc3545';
-      } else {
-        field.style.borderColor = '#28a745';
-      }
+    const control = this.specimenForm.get(field.id) as AbstractControl; // Obtener el FormControl
+
+    if (control && control.touched) {
+        if (control.invalid && field.hasAttribute('required')) {
+            field.style.borderColor = '#dc3545'; // Rojo si es inválido y requerido
+        } else {
+            field.style.borderColor = '#28a745'; // Verde si es válido o no requerido
+        }
     }
   }
 
   onFieldInput(event: any): void {
     const field = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    
-    if (field.hasAttribute('required') && field.value.trim() !== '') {
-      field.style.borderColor = '#28a745';
+    const control = this.specimenForm.get(field.id) as AbstractControl;
+
+    if (control && control.valid && control.value.trim() !== '') {
+        field.style.borderColor = '#28a745'; // Verde al escribir si es válido
+    } else {
+        field.style.borderColor = ''; // Limpiar si es vacío o inválido
     }
   }
 }

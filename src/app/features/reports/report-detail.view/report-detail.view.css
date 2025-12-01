@@ -108,6 +108,7 @@
     height: 50px;
     padding: 0 15px;
 
+    color: var(--night);
     background-color: #E5E5E5;
     border-radius: clamp(6px, 10px, 12px);
 

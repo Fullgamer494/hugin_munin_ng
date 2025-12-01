@@ -2,17 +2,37 @@
   <header class="main-header">
     <div class="page-name">
       <nav class="breadcrumb-nav">
-        <a [routerLink]="['/reports', reportTypeName()]">{{ reportTypeName() | titlecase }}</a>
+        <a [routerLink]="['/app/dashboard']">Dashboard</a>
+        <mat-icon>keyboard_arrow_right</mat-icon>
+        <a>Reporte {{ reportTypeName() | titlecase }}</a>
       </nav>
       <h1>Reporte {{ reportTypeName() }}</h1>
     </div>
   </header>
 
+  @if (error()) {
+  <div style="padding: 15px; background: #f8d7da; color: #721c24; border-radius: 8px; margin-bottom: 20px;">
+    <strong>Error:</strong> {{ error() }}
+  </div>
+  }
+
+  @if (success()) {
+  <div style="padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; margin-bottom: 20px;">
+    <strong>Éxito:</strong> {{ success() }}
+  </div>
+  }
+
   <div class="search-container">
     <div class="search">
       <label for="search"><mat-icon>search</mat-icon></label>
-      <input type="text" class="search-input" id="search" placeholder="Buscar por número de inventario PLXXX, MXXX"
-        [value]="searchQuery()" (input)="onSearchInput($event)" (blur)="hideResults()">
+      <input 
+        type="text" 
+        class="search-input" 
+        id="search" 
+        placeholder="Buscar por número de inventario PLXXX, MXXX"
+        [value]="searchQuery()" 
+        (input)="onSearchInput($event)" 
+        (blur)="hideResults()">
     </div>
 
     @if (showResults()) {
@@ -20,11 +40,11 @@
       @if (searchResults().length === 0) {
       <div class="search-result-item no-results">No se encontraron especímenes</div>
       } @else {
-      @for (specimen of searchResults(); track specimen.id_especimen) {
-      <div class="search-result-item" (click)="selectSpecimen(specimen)">
+      @for (specimen of searchResults(); track specimen.id) {
+      <div class="search-result-item" (mousedown)="selectSpecimen(specimen)">
         <div class="specimen-info">
-          <strong>{{ specimen.num_inventario }}</strong>
-          <span class="specimen-name">- {{ specimen.nombre_especimen || 'Sin nombre' }} -</span>
+          <strong>{{ specimen.numInventario }}</strong>
+          <span class="specimen-name">- {{ specimen.nombreEspecimen || 'Sin nombre' }} -</span>
           <i [class]="specimen.activo ? 'active' : 'inactive'">
             {{ specimen.activo ? 'Activo' : 'Inactivo' }}
           </i>
@@ -39,45 +59,47 @@
   @if (selectedSpecimen()) {
   <div class="selected-specimen">
     <h4>Espécimen seleccionado:</h4>
-    <p><strong>Número de inventario:</strong> {{ selectedSpecimen()!.num_inventario }}</p>
-    <p><strong>Nombre:</strong> {{ selectedSpecimen()!.nombre_especimen || 'Sin nombre' }}</p>
+    <p><strong>Número de inventario:</strong> {{ selectedSpecimen()!.numInventario }}</p>
+    <p><strong>Nombre:</strong> {{ selectedSpecimen()!.nombreEspecimen || 'Sin nombre' }}</p>
     <p><strong>Estado:</strong> {{ selectedSpecimen()!.activo ? 'Activo' : 'Inactivo' }}</p>
   </div>
   }
 
-  <div class="form-container">
+  <div class="form-container" style="position: relative; z-index: 1;">
     <form (ngSubmit)="onSubmit()">
-      @if (error()) {
-      <div class="form-message error">
-        {{ error() }}
-      </div>
-      }
-
-      @if (success()) {
-      <div class="form-message success">
-        {{ success() }}
-      </div>
-      }
-
+      
       <div class="report">
         <label for="asunto">Asunto:</label>
-        <input type="text" class="asunto" id="asunto" name="asunto" placeholder="Asunto del reporte..."
-          [value]="asunto()" (input)="asunto.set($any($event.target).value)" required>
+        <input 
+          type="text" 
+          class="asunto" 
+          id="asunto" 
+          name="asunto" 
+          placeholder="Asunto del reporte..."
+          [value]="asunto()" 
+          (input)="asunto.set($any($event.target).value)" 
+          required>
       </div>
 
       <div class="report">
         <label for="contenido">Contenido:</label>
-        <textarea id="contenido" name="contenido" rows="4" placeholder="Contenido del reporte..." [value]="contenido()"
-          (input)="contenido.set($any($event.target).value)" required></textarea>
+        <textarea 
+          id="contenido" 
+          name="contenido" 
+          rows="4" 
+          placeholder="Contenido del reporte..." 
+          [value]="contenido()"
+          (input)="contenido.set($any($event.target).value)" 
+          required></textarea>
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-submit" [disabled]="loading()">
           {{ loading() ? 'Generando reporte...' : 'Generar reporte' }}
         </button>
-        <button type="button" class="btn-reset" (click)="onCancel()">
+        <a routerLink="/app/dashboard" class="btn-reset">
           Cancelar
-        </button>
+        </a>
       </div>
     </form>
   </div>

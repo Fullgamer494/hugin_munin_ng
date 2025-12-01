@@ -1,94 +1,31 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-
 import { routes } from './app.routes';
-import { authInterceptor } from './infrastructure/interceptors/auth.interceptor';
-
-import { ReportRepository } from './core/domain/ports/outbound/report/report.repository';
-import { SpecimenRepository } from './core/domain/ports/outbound/report/specimen.repository';
-import {
-  GetAllReportsUseCase,
-  GetReportByIdUseCase,
-  GetReportsBySpecimenUseCase,
-  CreateReportUseCase,
-  UpdateReportUseCase,
-  DeleteReportUseCase
-} from './core/domain/ports/inbound/report/report.use-case';
-import {
-  SearchSpecimensUseCase,
-  GetSpecimenByIdUseCase
-} from './core/domain/ports/inbound/report/specimen.use-case';
-
-import { ReportRepositoryImpl } from './infrastructure/adapters/repositories/report/report.repository.impl';
-import { SpecimenRepositoryImpl } from './infrastructure/adapters/repositories/report/specimen.repository.impl';
-import {
-  GetAllReportsService,
-  GetReportByIdService,
-  GetReportsBySpecimenService,
-  CreateReportService,
-  UpdateReportService,
-  DeleteReportService
-} from './core/application/services/report/report.service';
-import {
-  SearchSpecimensService,
-  GetSpecimenByIdService
-} from './core/application/services/report/specimen.service';
-
-import { RegistrationRepository } from './infrastructure/adapters/repositories/report/register.repository';
-import { RegistrationRepositoryImpl } from './infrastructure/adapters/repositories/report/register.repository.impl';
-import {
-  CreateRegistroAltaUseCase,
-  GetAllRegistrosAltaUseCase,
-  GetRegistroAltaByIdUseCase,
-  UpdateRegistroAltaUseCase,
-  DeleteRegistroAltaUseCase,
-  CreateEspecieUseCase,
-  GetAllEspeciesUseCase,
-  GetEspecieByIdUseCase
-} from './features/animals/register-form.view/register.case';
-import {
-  CreateRegistroAltaService,
-  GetAllRegistrosAltaService,
-  GetRegistroAltaByIdService,
-  UpdateRegistroAltaService,
-  DeleteRegistroAltaService,
-  CreateEspecieService,
-  GetAllEspeciesService,
-  GetEspecieByIdService
-} from './core/application/services/report/register.service';
+import { authInterceptor } from './api/interceptors/auth.interceptor';
+import { AuthPort } from './api/domain/ports/auth.port';
+import { AuthAdapter } from './api/infrastructure/adapters/auth.adapter';
+import { EspecimenAltaPort } from './api/domain/ports/especimen-alta.port';
+import { EspecimenAltaAdapter } from './api/infrastructure/adapters/especimen-alta.adapter';
+import { ReportPort } from './api/domain/ports/report.port';
+import { ReportAdapter } from './api/infrastructure/adapters/report.adapter';
+import { EspecimenService } from './api/application/especimen.service';
+import { RegistroBajaPort } from './api/domain/ports/especimen-baja.port';
+import { EspecimenBajaAdapter } from './api/infrastructure/adapters/especimen-baja.adapter';
+import { StatisticsPort } from './api/domain/ports/statistics.port';
+import { StatisticsAdapter } from './api/infrastructure/adapters/statistics.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' })),
     provideHttpClient(withInterceptors([authInterceptor])),
-    
-    { provide: ReportRepository, useClass: ReportRepositoryImpl },
-    { provide: SpecimenRepository, useClass: SpecimenRepositoryImpl },
-    
-    { provide: GetAllReportsUseCase, useClass: GetAllReportsService },
-    { provide: GetReportByIdUseCase, useClass: GetReportByIdService },
-    { provide: GetReportsBySpecimenUseCase, useClass: GetReportsBySpecimenService },
-    { provide: CreateReportUseCase, useClass: CreateReportService },
-    { provide: UpdateReportUseCase, useClass: UpdateReportService },
-    { provide: DeleteReportUseCase, useClass: DeleteReportService },
-    
-    { provide: SearchSpecimensUseCase, useClass: SearchSpecimensService },
-    { provide: GetSpecimenByIdUseCase, useClass: GetSpecimenByIdService },
 
-  
-    { provide: RegistrationRepository, useClass: RegistrationRepositoryImpl },
-    
-    { provide: CreateRegistroAltaUseCase, useClass: CreateRegistroAltaService },
-    { provide: GetAllRegistrosAltaUseCase, useClass: GetAllRegistrosAltaService },
-    { provide: GetRegistroAltaByIdUseCase, useClass: GetRegistroAltaByIdService },
-    { provide: UpdateRegistroAltaUseCase, useClass: UpdateRegistroAltaService },
-    { provide: DeleteRegistroAltaUseCase, useClass: DeleteRegistroAltaService },
-    
-    { provide: CreateEspecieUseCase, useClass: CreateEspecieService },
-    { provide: GetAllEspeciesUseCase, useClass: GetAllEspeciesService },
-    { provide: GetEspecieByIdUseCase, useClass: GetEspecieByIdService }
+    { provide: AuthPort, useClass: AuthAdapter },
+    { provide: EspecimenAltaPort, useClass: EspecimenAltaAdapter },
+    { provide: ReportPort, useClass: ReportAdapter },
+    { provide: RegistroBajaPort, useClass: EspecimenBajaAdapter },
+    { provide: StatisticsPort, useClass: StatisticsAdapter },
+    { provide: EspecimenService, useClass: EspecimenService },
   ]
 };

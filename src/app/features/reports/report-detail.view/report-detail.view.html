@@ -2,29 +2,40 @@
   <header class="main-header">
     <div class="page-name">
       <nav class="breadcrumb-nav">
-        <a routerLink="/animals">Animales</a>
+        <a [routerLink]="rootLink()">{{ rootText() }}</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        @if (report()) {
-        <a [routerLink]="['/specimen', report()!.id_especimen]">
-          Ejemplar <span>{{ report()!.getSpecimenIdentifier() }}</span>
+        @if (report(); as reportData) {
+        <a [routerLink]="specimenLink()" [queryParams]="{ origin: origin() }">
+          Ejemplar <span>{{ specimenInventory() }}</span>
         </a>
+
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a [routerLink]="['/reports/history']" [queryParams]="{ id: report()!.id_especimen }">
+
+        <a [routerLink]="['/app/reports/history', reportData.especimenId]" [queryParams]="{ origin: origin() }">
           Historial de reportes
         </a>
+
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a>Reporte <span id="asunto">{{ report()!.asunto }}</span></a>
+
+        <a>Reporte <span id="asunto">{{ reportData.asunto }}</span></a>
         }
       </nav>
       @if (report()) {
-      <h1>Ver reporte <span id="tipoReporte">{{ report()!.getTipoReporteName().toLowerCase() }}</span></h1>
+      <h1>Ver reporte <span id="tipoReporte">{{ getTipoReporteName(report()!.tipoReporteId).toLowerCase() }}</span></h1>
       }
     </div>
     <div class="back-btn">
-      <a (click)="goBack()">
+      @if (report(); as reportData) {
+      <a [routerLink]="['/app/reports/history', reportData.especimenId]" [queryParams]="{ origin: origin() }">
         <mat-icon>arrow_back</mat-icon>
         Regresar
       </a>
+      } @else {
+      <a class="disabled-link">
+        <mat-icon>arrow_back</mat-icon>
+        Regresar
+      </a>
+      }
     </div>
   </header>
 
@@ -41,7 +52,7 @@
     <div class="reporte-actions">
       <button (click)="downloadPDF()">
         <span>Descargar PDF</span>
-        <mat-icon>arrow_back</mat-icon>
+        <mat-icon>download</mat-icon>
       </button>
     </div>
 
@@ -52,23 +63,23 @@
         </div>
         <div class="fecha-reporte">
           <span class="label">Fecha del reporte:</span>
-          <span class="value">{{ report()!.getFormattedDate() }}</span>
+          <span class="value">{{ report()!.fechaReporte }}</span>
         </div>
       </div>
 
       <div class="reporte-title">
         <h2>{{ report()!.asunto }}</h2>
-        <h3>{{ report()!.getSpecimenIdentifier() }}</h3>
+        <h3>Espécimen #{{ report()!.especimenId }}</h3>
       </div>
 
       <div class="reporte-details">
         <div class="detail-info">
           <span class="label">Número de inventario del espécimen:</span>
-          <span class="value">{{ report()!.getSpecimenIdentifier() }}</span>
+          <span class="value">#{{ report()!.especimenId }}</span>
           <span class="label">ID de reporte:</span>
-          <span class="value">{{ report()!.id_reporte }}</span>
-          <span class="label">Nombre científico:</span>
-          <span class="value">{{ report()!.getSpecimenScientificName() }}</span>
+          <span class="value">{{ report()!.id }}</span>
+          <span class="label">Tipo de reporte:</span>
+          <span class="value">{{ getTipoReporteName(report()!.tipoReporteId) }}</span>
         </div>
       </div>
 
@@ -77,8 +88,8 @@
       </div>
 
       <div class="reporte-responsable">
-        <span class="label">Att:</span>
-        <span class="value">{{ report()!.getResponsableName() }}</span>
+        <span class="label">Responsable:</span>
+        <span class="value">Usuario #{{ report()!.responsableId }}</span>
       </div>
     </div>
   </div>

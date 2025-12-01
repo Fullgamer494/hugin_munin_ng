@@ -2,16 +2,18 @@
   <header class="main-header">
     <div class="page-name">
       <nav class="breadcrumb-nav">
-        <a routerLink="/animals">Animales</a>
+        <a [routerLink]="rootLink()">{{ rootText() }}</a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a>Ejemplar <span>{{ specimenNumber() }}</span></a>
+        <a [routerLink]="specimenLink()" [queryParams]="{ origin: origin() }">
+          Ejemplar <span>{{ specimenNumber() }}</span>
+        </a>
         <mat-icon>keyboard_arrow_right</mat-icon>
-        <a>Historial de reportes</a>
+        <a routerLink="./" [queryParams]="{ origin: origin() }">Historial de reportes</a>
       </nav>
-      <h1>Historial de reportes</h1>
+      <h1>Historial de reportes: {{ specimenName() }} ({{ specimenNumber() }})</h1>
     </div>
     <div class="back-btn">
-      <a (click)="goBack()">
+      <a [routerLink]="specimenLink()" [queryParams]="{ origin: origin() }">
         <mat-icon>arrow_back</mat-icon>
         Regresar
       </a>
@@ -62,29 +64,29 @@
           </tr>
         </thead>
         <tbody>
-          @for (report of paginatedReports(); track report.id_reporte) {
+          @for (report of paginatedReports(); track report.id) {
           <tr>
             <td>
-              <input type="checkbox" class="checkbox row-checkbox" [checked]="isSelected(report.id_reporte)"
-                (change)="toggleSelectReport(report.id_reporte)">
+              <input type="checkbox" class="checkbox row-checkbox" [checked]="isSelected(report.id)"
+                (change)="toggleSelectReport(report.id)">
             </td>
             <td>{{ report.asunto }}</td>
-            <td>{{ report.getTipoReporteName() }}</td>
-            <td>{{ report.getResponsableName() }}</td>
-            <td>{{ report.getFormattedDate() }}</td>
+            <td>{{ getTipoReporteName(report.tipoReporteId) }}</td>
+            <td>Responsable #{{ report.responsableId }}</td>
+            <td>{{ report.fechaReporte }}</td>
             <td>
               <div class="actions-cell">
-                <button class="actions-btn" (click)="toggleMenu(report.id_reporte)">
+                <button class="actions-btn" (click)="toggleMenu(report.id)">
                   <mat-icon>more_vert</mat-icon>
                 </button>
-                <div class="actions-menu" [class.show]="isMenuOpen(report.id_reporte)">
-                  <a [routerLink]="['/detail', report.id_reporte]">
+                <div class="actions-menu" [class.show]="isMenuOpen(report.id)">
+                  <a [routerLink]="['/app/reports/detail', report.id]" [queryParams]="{ origin: origin() }">
                     <mat-icon>visibility</mat-icon> Ver
                   </a>
-                  <a [routerLink]="['/reports/edit', report.id_reporte]">
+                  <a [routerLink]="['/app/reports/edit', report.id]" [queryParams]="{ origin: origin() }">
                     <mat-icon>edit</mat-icon> Editar
                   </a>
-                  <button (click)="deleteReport(report.id_reporte)">
+                  <button (click)="deleteReport(report.id)">
                     <mat-icon>delete</mat-icon> Eliminar
                   </button>
                 </div>

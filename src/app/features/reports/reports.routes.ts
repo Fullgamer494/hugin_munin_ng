@@ -3,8 +3,8 @@ import { Routes } from '@angular/router';
 export const reportRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./report-form.view/report-form.view').then(m => m.ReportFormView),
-    data: { reportType: 1 }
+    redirectTo: 'clinical',
+    pathMatch: 'full'
   },
   {
     path: 'clinical',
@@ -27,6 +27,11 @@ export const reportRoutes: Routes = [
     data: { reportType: 4 }
   },
   {
+    path: 'transfer',
+    loadComponent: () => import('./report-form.view/report-form.view').then(m => m.ReportFormView),
+    data: { reportType: 5 }
+  },
+  {
     path: 'detail/:id',
     loadComponent: () => import('./report-detail.view/report-detail.view').then(m => m.ReportDetailView)
   },
@@ -35,7 +40,7 @@ export const reportRoutes: Routes = [
     loadComponent: () => import('./report-edit.view/report-edit.view').then(m => m.ReportEditView)
   },
   {
-    path: 'history',
-    loadComponent: () => import('./report-history.view/report-history.viewn').then(m => m.ReportHistoryView)
+    path: 'history/:id',
+    loadComponent: () => import('./report-history.view/report-history.view').then(m => m.ReportHistoryView)
   }
 ];
