@@ -32,6 +32,7 @@ class AuthRepositoryImpl : AuthRepository {
             rolId = userRow[UsuarioTable.rolId],
             rolNombre = userRow[RolTable.nombre],
             permisos = permisos,
+            contrasena = userRow[UsuarioTable.contrasena],
             activo = userRow[UsuarioTable.activo]
         )
     }
@@ -58,6 +59,7 @@ class AuthRepositoryImpl : AuthRepository {
             rolId = userRow[UsuarioTable.rolId],
             rolNombre = userRow[RolTable.nombre],
             permisos = permisos,
+            contrasena = userRow[UsuarioTable.contrasena],
             activo = userRow[UsuarioTable.activo]
         )
     }

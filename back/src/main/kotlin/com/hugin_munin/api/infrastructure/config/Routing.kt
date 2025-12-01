@@ -24,6 +24,7 @@ fun Application.configureRouting() {
     val registroBajaService by inject<RegistroBajaService>()
     val reporteService by inject<ReporteService>()
     val trasladoService by inject<TrasladoService>()
+    val estadisticasService by inject<EstadisticasService>()
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
@@ -49,6 +50,7 @@ fun Application.configureRouting() {
                 registroBajaRouting(registroBajaService)
                 reporteRouting(reporteService)
                 trasladoRouting(trasladoService)
+                estadisticasRouting(estadisticasService)
             }
         }
     }

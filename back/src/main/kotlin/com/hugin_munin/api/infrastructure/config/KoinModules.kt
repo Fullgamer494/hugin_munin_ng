@@ -13,6 +13,9 @@ val appModule = module {
     single<ReporteRepository> { ReporteRepositoryImpl() }
     single<CausaBajaRepository> { CausaBajaRepositoryImpl() }
     single<RegistroBajaRepository> { RegistroBajaRepositoryImpl() }
+    single<EstadisticasRepository> { EstadisticasRepositoryImpl() }
+    single { EstadisticasService(get()) }
+
 
     single<AuthRepository> { AuthRepositoryImpl() }
 

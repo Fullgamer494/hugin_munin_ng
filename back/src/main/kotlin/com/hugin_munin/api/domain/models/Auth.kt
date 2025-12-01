@@ -32,6 +32,7 @@ data class AuthenticatedUser(
     val id: Int,
     val nombreUsuario: String,
     val correo: String,
+    val contrasena: String,
     val rolId: Int,
     val rolNombre: String,
     val permisos: List<String>,

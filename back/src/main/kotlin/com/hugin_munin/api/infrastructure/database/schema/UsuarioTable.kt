@@ -8,6 +8,7 @@ object UsuarioTable : Table("usuario") {
     val rolId = integer("id_rol").references(RolTable.id, onDelete = ReferenceOption.RESTRICT)
     val nombreUsuario = varchar("nombre_usuario", 100).uniqueIndex()
     val correo = varchar("correo", 100).uniqueIndex()
+    val contrasena = varchar("contrasena", 100) // ← AGREGAR ESTE CAMPO
     val activo = bool("activo").default(true)
     override val primaryKey = PrimaryKey(id)
 }

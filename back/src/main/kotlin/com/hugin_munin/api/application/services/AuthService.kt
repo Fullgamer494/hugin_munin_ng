@@ -18,9 +18,10 @@ class AuthService(
             return null
         }
 
-        // if (!BCrypt.checkpw(password, user.hashedPassword)) {
-        //     return null
-        // }
+        // DESCOMENTAR Y CAMBIAR hashedPassword por contrasena:
+        if (password != user.contrasena) {
+            return null
+        }
 
         // Generar claims para el JWT
         val claims = JwtClaims(
