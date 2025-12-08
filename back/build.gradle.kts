@@ -58,3 +58,27 @@ dependencies {
     // CORS
     implementation("io.ktor:ktor-server-cors-jvm:3.0.3")
 }
+
+tasks {
+    shadowJar {
+        archiveBaseName.set("app")
+        archiveClassifier.set("all")
+        archiveVersion.set(project.version.toString())
+
+        manifest {
+            attributes(
+                "Main-Class" to application.mainClass.get()
+            )
+        }
+
+        mergeServiceFiles()
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+}
+
+kotlin {
+    jvmToolchain(21)
+}

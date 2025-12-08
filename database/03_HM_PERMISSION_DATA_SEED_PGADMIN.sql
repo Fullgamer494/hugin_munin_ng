@@ -11,7 +11,7 @@ INSERT INTO rol_permiso (id_rol, id_permiso) VALUES
 (1, 23), (1, 24), (1, 25), (1, 26), (1, 27), -- Permisos de REPORTES DE DEFUNCIÓN
 (1, 28), (1, 29), (1, 30), (1, 31), (1, 32); -- Permisos de REPORTES DE TRASLADO
 
-q
+
 -- ========================================
 -- 2. BIÓLOGO (id_rol = 2)
 -- Enfoque en manejo de especímenes y reportes científicos

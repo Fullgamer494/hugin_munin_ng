@@ -1,0 +1,110 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'back/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      
+      - name: Dar permisos a gradlew
+        run: chmod +x back/gradlew
+      
+      - name: Build con Gradle
+        working-directory: ./back
+        run: |
+          ./gradlew clean shadowJar
+          
+          echo "=== JAR generado ==="
+          ls -lh build/libs/
+          
+          if [ ! -f build/libs/*.jar ]; then
+            echo "ERROR: No se generó el JAR"
+            exit 1
+          fi
+      
+      - name: Preparar JAR
+        run: |
+          JAR_FILE=$(find back/build/libs -name "*-all.jar" -type f | head -n 1)
+          
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          NEW_NAME="app-${TIMESTAMP}.jar"
+          
+          cp "$JAR_FILE" "$NEW_NAME"
+          
+          echo "JAR_NAME=$NEW_NAME" >> $GITHUB_ENV
+          echo "=== JAR preparado: $NEW_NAME ==="
+          ls -lh "$NEW_NAME"
+      
+      - name: Pre-Deployment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            echo "=== Ejecutando pre-deploy ==="
+            sudo /opt/apps/backend/scripts/pre-deploy
+            echo "=== Aplicación detenida ==="
+      
+      - name: Copiar JAR a EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          source: ${{ env.JAR_NAME }}
+          target: /opt/apps/backend/
+          strip_components: 0
+      
+      - name: Post-Deployment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            echo "=== Ejecutando post-deploy ==="
+            sudo /opt/apps/backend/scripts/post-deploy
+            echo "=== Deployment completado ==="
+      
+      - name: Health Check
+        run: |
+          echo "=== Verificando salud de la API ==="
+          
+          sleep 15
+          
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Intento $ATTEMPT de $MAX_ATTEMPTS"
+            
+            if curl -f http://${{ secrets.EC2_HOST }}:8080/health; then
+              echo "API respondiendo correctamente"
+              exit 0
+            fi
+            
+            echo "API no responde, esperando..."
+            sleep 10
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+          
+          echo "ERROR: API no respondió después de $MAX_ATTEMPTS intentos"
+          exit 1

@@ -24,9 +24,8 @@ fun Application.module() {
 
     install(CORS) {
 
-        // 1. Orígenes (Hosts) permitidos
-        // **Hardcodeado para el frontend de desarrollo:**
-        allowHost("localhost:4200", schemes = listOf("http"))
+        // **CORS Permisivo para pruebas (luego restringir a dominio real):**
+        anyHost()
 
         // Opcional: Si tienes un dominio de producción
         // allowHost("tudominiofrontend.com", schemes = listOf("https"))
