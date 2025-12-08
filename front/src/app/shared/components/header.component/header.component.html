@@ -1,0 +1,20 @@
+<div class="header-content">
+    <a routerLink="./" class="logo">
+        <img src="assets/logo.svg" alt="">
+    </a>
+    <div class="user-controls">
+        <button>
+            <mat-icon>notifications</mat-icon>
+        </button>
+
+        <a routerLink="" class="user-info">
+            <div class="user-details">
+                <span class="user-name">{{ nombreUsuario }}</span>
+                <span class="user-role">{{ rol }}</span>
+            </div>
+            <div class="user-pic">
+                <img src="{{ urlPic }}" alt="">
+            </div>
+        </a>
+    </div>
+</div>
